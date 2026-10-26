@@ -40,5 +40,24 @@ class PublicationTests(unittest.TestCase):
                 self.assertFalse((root / 'sitemap.xml').exists())
 
 
+    def test_seo_meta_is_regenerated_once(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'articles').mkdir()
+            (root / 'articles/example.html').write_text('<html><head><title>見出し&lt;A&gt;｜くらしの手帖</title><meta name="description" content="説明"></head><body><footer>f</footer></body></html>')
+            (root / 'index.html').write_text('<html><head><title>トップ</title></head><body><div id="automaticArticles" class="articles" aria-live="polite"></div><footer><div class="footerlinks"></div></footer></body></html>')
+            (root / 'articles.json').write_text(json.dumps([{'path': 'articles/example.html', 'title': 't', 'description': 'd', 'checked_at': '2026-10-26'}]))
+            build(root)
+            build(root)
+            article = (root / 'articles/example.html').read_text()
+            self.assertEqual(article.count('property="og:title"'), 1)
+            self.assertEqual(article.count('application/ld+json'), 1)
+            self.assertIn('"dateModified": "2026-10-26"', article)
+            self.assertNotIn('<A>', article)
+            index = (root / 'index.html').read_text()
+            self.assertIn('content="website"', index)
+            self.assertNotIn('application/ld+json', index)
+
+
 if __name__ == '__main__':
     unittest.main()

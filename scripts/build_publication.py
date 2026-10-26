@@ -8,6 +8,7 @@ import xml.etree.ElementTree as ET
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'https://magonoteinnovation-ctrl.github.io/ai-revenue-site/'
 OFFICIAL_URL = 'https://magonote-innovation.wixsite.com/benriya'
+GUIDE_PATHS = ('pest-control-guide.html', 'unwanted-items-guide.html')
 START = '<!-- 自動記事一覧 開始 -->'
 END = '<!-- 自動記事一覧 終了 -->'
 NS = 'http://www.sitemaps.org/schemas/sitemap/0.9'
@@ -49,6 +50,35 @@ def cards(items):
         f'<h3><a href="{e(x["path"], quote=True)}">{e(x["title"])}</a></h3>'
         f'<p>{e(x["description"])}</p><p>資料確認日：{e(x["checked_at"])}</p></article>'
         for x in items)
+
+
+SEO_START, SEO_END = '<!-- SEO 開始 -->', '<!-- SEO 終了 -->'
+PUBLISHER = '株式会社まごの手INNOVATION'
+
+
+def seo_meta(text, url, kind, modified=None):
+    """OGPと構造化データを毎回作り直す。手書きのタグとは重複させない。"""
+    e = lambda v: html.escape(v, quote=True)
+    title = re.search(r'<title>(.*?)</title>', text, re.S)
+    desc = re.search(r'<meta name="description" content="([^"]*)"', text)
+    title = html.unescape(title.group(1).strip()) if title else 'くらしの手帖'
+    desc = html.unescape(desc.group(1)) if desc else ''
+    tags = [f'<meta property="og:{k}" content="{e(v)}">' for k, v in (
+        ('type', 'article' if kind == 'article' else 'website'), ('site_name', 'くらしの手帖'),
+        ('title', title), ('description', desc), ('url', url), ('locale', 'ja_JP'))]
+    tags.append('<meta name="twitter:card" content="summary">')
+    if kind == 'article':
+        data = {'@context': 'https://schema.org', '@type': 'Article', 'headline': title.split('｜')[0][:110],
+                'description': desc, 'mainEntityOfPage': url, 'inLanguage': 'ja',
+                'author': {'@type': 'Organization', 'name': PUBLISHER, 'url': OFFICIAL_URL},
+                'publisher': {'@type': 'Organization', 'name': PUBLISHER, 'url': OFFICIAL_URL}}
+        if modified:
+            data['dateModified'] = modified
+        tags.append('<script type="application/ld+json">' +
+                    json.dumps(data, ensure_ascii=False).replace('<', '\\u003c') + '</script>')
+    block = SEO_START + ''.join(tags) + SEO_END
+    text = re.sub(re.escape(SEO_START) + '.*?' + re.escape(SEO_END) + r'\n?', '', text, flags=re.S)
+    return text.replace('</head>', block + '\n</head>', 1)
 
 
 def set_canonical(text, url):
@@ -96,11 +126,14 @@ main{max-width:900px;padding:40px 22px 70px;margin:auto}h1{font-size:34px}
     list_page += '<p><a href="sitemap.xml">検索エンジン向けのサイトマップ</a></p></main><footer>くらしの手帖</footer></body></html>'
     (root / 'article-list.html').write_text(set_canonical(list_page, BASE + 'article-list.html'), encoding='utf-8')
     available = [path for path, _ in SUPPORT if (root / path).is_file()]
+    dated_items = {x['path']: x['checked_at'] for x in items}
     paths = [p for p in ['pest-control-guide.html', 'unwanted-items-guide.html'] if (root / p).is_file()] + [x['path'] for x in items] + available
     for path in ['index.html', 'article-list.html'] + paths:
         file = root / path
         text = set_canonical(file.read_text(encoding='utf-8'), BASE + ('' if path == 'index.html' else path))
         text = support_links(text, '../' if path.startswith('articles/') else '', available)
+        kind = 'article' if path.startswith('articles/') or path in GUIDE_PATHS else 'page'
+        text = seo_meta(text, BASE + ('' if path == 'index.html' else path), kind, dated_items.get(path))
         file.write_text(text, encoding='utf-8')
     ET.register_namespace('', NS)
     sitemap = ET.Element('{' + NS + '}urlset')

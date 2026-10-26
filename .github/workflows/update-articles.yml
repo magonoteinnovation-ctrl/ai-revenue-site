@@ -30,10 +30,18 @@ jobs:
         run: python -m unittest discover -s scripts -p 'test_*.py'
       - name: 無料枠を確認して記事を生成
         if: github.event_name != 'push'
+        id: generate
+        # 資料サイトやAPIの一時障害で、既存記事の公開まで止めない（失敗は警告として残す）
+        continue-on-error: true
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_FREE_TIER_CONFIRMED: ${{ vars.GEMINI_FREE_TIER_CONFIRMED }}
         run: python scripts/update_articles.py
+      - name: 記事生成の失敗を警告
+        if: steps.generate.outcome == 'failure'
+        run: |
+          git checkout -- articles articles.json automation-state.json 2>/dev/null || true
+          echo "::warning::記事生成に失敗したため、既存記事のまま公開します。ログを確認してください。"
       - name: 記事一覧と検索用サイトマップを更新
         run: python scripts/build_publication.py
       - name: 公開前にリンクを検証
@@ -51,7 +59,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "公式資料を確認して記事を更新"
-          git push
+          # 連続pushで先に別のコミットが入っていても失敗しないよう、取り込んでから保存する
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push && exit 0
+            sleep 5
+          done
+          exit 1
       - name: 公開用ファイルだけを準備
         run: |
           mkdir -p _site
