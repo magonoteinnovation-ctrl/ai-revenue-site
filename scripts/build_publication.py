@@ -51,6 +51,10 @@ def cards(items):
 
 
 def set_canonical(text, url):
+    # 所有権確認のみ。広告配信スクリプトは審査・同意設定後に追加する。
+    meta = '<meta name="google-adsense-account" content="ca-pub-8158546915072061">'
+    if 'name="google-adsense-account"' not in text:
+        text = text.replace('</head>', meta + '\n</head>')
     text = re.sub(r'<link\b[^>]*\brel=["\x27]canonical["\x27][^>]*>\s*', '', text, flags=re.I)
     return text.replace('</head>', '<link rel="canonical" href="' + html.escape(url, quote=True) + '">\n</head>')
 
