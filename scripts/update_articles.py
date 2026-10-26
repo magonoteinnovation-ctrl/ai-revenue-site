@@ -81,6 +81,17 @@ sectionsは3〜4個。各textは70〜180文字。titleとheadingにも根拠の�
     body = json.dumps({
         'contents': [{'parts': [{'text': prompt}]}],
         'generationConfig': {'responseMimeType': 'application/json',
+                             'responseSchema': {
+                                 'type': 'OBJECT',
+                                 'required': ['title', 'sections'],
+                                 'properties': {
+                                     'title': {'type': 'STRING'},
+                                     'sections': {'type': 'ARRAY', 'minItems': 3, 'maxItems': 4,
+                                                  'items': {'type': 'OBJECT',
+                                                            'required': ['heading', 'text', 'evidence'],
+                                                            'properties': {field: {'type': 'STRING'} for field in ('heading', 'text', 'evidence')}}},
+                                 },
+                             },
                              'maxOutputTokens': 2500, 'temperature': 0.2},
     }).encode()
     req = urllib.request.Request(
@@ -109,7 +120,7 @@ def validate(article, source_text):
         for field in ('heading', 'text', 'evidence'):
             if not isinstance(section.get(field), str):
                 raise ValueError('段落の形式が不正です')
-        if not 3 <= len(section['heading']) <= 50 or not 70 <= len(section['text']) <= 180:
+        if not 3 <= len(section['heading']) <= 70 or not 40 <= len(section['text']) <= 350:
             raise ValueError('段落の長さが不正です')
         evidence = normalize(section['evidence'])
         if len(evidence) < 20 or evidence not in normalize(source_text):
@@ -185,6 +196,9 @@ if __name__ == '__main__':
     except urllib.error.HTTPError as error:
         # APIレスポンス本文、URL、認証情報をログに出さない。
         print(f'取得先のHTTPエラー（{error.code}）のため更新を中止しました。')
+        sys.exit(1)
+    except ValueError as error:
+        print('記事の検証により更新を中止しました：' + str(error))
         sys.exit(1)
     except Exception as error:
         print(f'更新を中止しました（{type(error).__name__}）。公開済みの記事は維持します。')
