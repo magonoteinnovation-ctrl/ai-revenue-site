@@ -69,7 +69,7 @@ jobs:
       - name: 公開用ファイルだけを準備
         run: |
           mkdir -p _site
-          cp index.html pest-control-guide.html unwanted-items-guide.html articles.json article-list.html sitemap.xml about.html contact.html privacy.html request-memo.html site-support.css _site/
+          cp index.html pest-control-guide.html unwanted-items-guide.html articles.json article-list.html sitemap.xml about.html contact.html privacy.html request-memo.html site-support.css readability.css _site/
           if [ -d articles ]; then cp -R articles _site/; fi
       - uses: actions/upload-pages-artifact@v3
         with:
