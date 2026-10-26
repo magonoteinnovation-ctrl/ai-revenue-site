@@ -16,10 +16,10 @@ from urllib.parse import urlparse
 ROOT = Path(__file__).resolve().parents[1]
 MODEL = 'gemini-3.5-flash-lite'
 SOURCES = [
-    {'slug': 'airconditioning', 'title': 'エアコンの使い方を見直すポイント',
-     'url': 'https://www.enecho.meti.go.jp/category/saving_and_new/saving/general/howto/airconditioning/index.html'},
-    {'slug': 'energy-saving-appliances', 'title': '家電を買い替える前に確認したい省エネ情報',
-     'url': 'https://www.enecho.meti.go.jp/category/saving_and_new/saving/general/choice/index.html'},
+    {'slug': 'cleaning-product-safety', 'title': '掃除用洗浄剤を使う前に確認したいこと',
+     'url': 'https://www.kokusen.go.jp/news/data/n-20260318_1.html'},
+    {'slug': 'house-cleaning-checklist', 'title': 'ハウスクリーニングを依頼する前の確認事項',
+     'url': 'https://www.kokusen.go.jp/news/data/n-20250228_1.html'},
 ]
 
 
@@ -47,18 +47,21 @@ def fetch_source(url):
     # 固定した公的資料のみ。リダイレクト先も同じホストであることを確認。
     req = urllib.request.Request(url, headers={'User-Agent': 'KurashiSourceMonitor/1.0'})
     with urllib.request.urlopen(req, timeout=30) as response:
-        if urlparse(response.url).hostname != 'www.enecho.meti.go.jp':
+        if urlparse(response.url).hostname != 'www.kokusen.go.jp':
             raise ValueError('資料の移動先が許可されていません')
         if 'html' not in response.headers.get('Content-Type', ''):
             raise ValueError('資料がHTML形式ではありません')
         raw = response.read(1_000_001)
         if len(raw) > 1_000_000:
             raise ValueError('資料が大きすぎます')
-        charset = response.headers.get_content_charset() or 'utf-8'
+        charset = response.headers.get_content_charset()
+        if not charset:
+            match = re.search(br'charset=["\x27]?([A-Za-z0-9_-]+)', raw[:4096], re.I)
+            charset = match.group(1).decode('ascii') if match else 'utf-8'
     parser = Extractor()
     parser.feed(raw.decode(charset, errors='replace'))
     text = '\n'.join(parser.parts)
-    if len(text) < 500 or '省エネ' not in text:
+    if len(text) < 500 or not any(word in text for word in ('掃除', '洗浄', 'クリーニング')):
         raise ValueError('資料本文を確認できません')
     return text[:24000]
 
@@ -130,8 +133,8 @@ def render(article, source, day):
 <body><header><a href="../index.html">くらしの手帖｜トップへ戻る</a></header>
 <main><p><small>住まい・暮らし ／ 資料確認日：{day}</small></p>
 <h1>{e(article['title'])}</h1>
-<aside>この記事は資源エネルギー庁の公開資料をAIで要約したものです。実際の作業・使用体験を紹介した記事ではありません。詳しい条件は出典とお使いの製品の取扱説明書をご確認ください。</aside>
-{sections}<aside><strong>出典・確認日</strong><p><a href="{e(source['url'], quote=True)}" rel="noopener">資源エネルギー庁の公式資料を読む</a></p><p>確認日：{day}。資料の更新に応じて内容を見直します。AIの要約に誤りがある可能性があるため、判断の際は原文をご確認ください。</p></aside>
+<aside>この記事は国民生活センターの公開資料をAIで要約したものです。実際の作業・使用体験を紹介した記事ではありません。詳しい条件は出典とお使いの製品の取扱説明書をご確認ください。</aside>
+{sections}<aside><strong>出典・確認日</strong><p><a href="{e(source['url'], quote=True)}" rel="noopener">国民生活センターの公式資料を読む</a></p><p>確認日：{day}。資料の更新に応じて内容を見直します。AIの要約に誤りがある可能性があるため、判断の際は原文をご確認ください。</p></aside>
 <a href="../index.html#articles">記事一覧へ戻る</a></main><footer>くらしの手帖</footer></body></html>'''
 
 
@@ -149,10 +152,12 @@ def main():
     day = datetime.now(ZoneInfo('Asia/Tokyo')).date().isoformat()
     updated = False
     for source in SOURCES:
+        print('公式資料を確認：' + source['slug'], flush=True)
         text = fetch_source(source['url'])
         digest = hashlib.sha256(normalize(text).encode()).hexdigest()
         if state.get(source['slug'], {}).get('hash') == digest:
             continue
+        print('Geminiで要約を生成します。', flush=True)
         article = generate(source, text, key)
         # 検証が済んだ後にだけ、公開対象ファイルを書き込みます。
         (ROOT / 'articles').mkdir(exist_ok=True)
