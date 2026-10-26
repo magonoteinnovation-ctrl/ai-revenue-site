@@ -59,5 +59,20 @@ class PublicationTests(unittest.TestCase):
             self.assertNotIn('application/ld+json', index)
 
 
+    def test_readability_css_once_and_no_layout_css_on_index(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'articles').mkdir()
+            (root / 'articles/example.html').write_text('<html><head></head><body><footer>f</footer></body></html>')
+            (root / 'index.html').write_text('<html><head><style>header{background:#fff}</style></head><body><div id="automaticArticles" class="articles" aria-live="polite"></div><footer><div class="footerlinks"></div></footer></body></html>')
+            (root / 'articles.json').write_text(json.dumps([{'path': 'articles/example.html', 'title': 't', 'description': 'd', 'checked_at': '2026-10-26'}]))
+            build(root)
+            build(root)
+            index = (root / 'index.html').read_text()
+            self.assertEqual(index.count('href="readability.css"'), 1)
+            self.assertNotIn('site-support.css', index)
+            self.assertEqual((root / 'articles/example.html').read_text().count('href="../readability.css"'), 1)
+
+
 if __name__ == '__main__':
     unittest.main()
