@@ -29,12 +29,15 @@ jobs:
       - name: 自動更新と記事一覧の検証
         run: python -m unittest discover -s scripts -p 'test_*.py'
       - name: 無料枠を確認して記事を生成
+        if: github.event_name != 'push'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_FREE_TIER_CONFIRMED: ${{ vars.GEMINI_FREE_TIER_CONFIRMED }}
         run: python scripts/update_articles.py
       - name: 記事一覧と検索用サイトマップを更新
         run: python scripts/build_publication.py
+      - name: 公開前にリンクを検証
+        run: python scripts/check_publication.py
       - name: 検証済みの記事を保存
         run: |
           git add articles.json automation-state.json index.html pest-control-guide.html article-list.html sitemap.xml about.html contact.html privacy.html request-memo.html site-support.css
