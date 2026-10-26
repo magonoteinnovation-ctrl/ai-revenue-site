@@ -10,6 +10,17 @@ BASE = 'https://magonoteinnovation-ctrl.github.io/ai-revenue-site/'
 START = '<!-- 自動記事一覧 開始 -->'
 END = '<!-- 自動記事一覧 終了 -->'
 NS = 'http://www.sitemaps.org/schemas/sitemap/0.9'
+SUPPORT = [('request-memo.html', '作業依頼メモ'), ('about.html', 'このサイトについて'),
+           ('contact.html', 'お問い合わせ'), ('privacy.html', 'プライバシーと広告')]
+
+
+def support_links(text, prefix, available):
+    start, end = '<!-- 共通案内 開始 -->', '<!-- 共通案内 終了 -->'
+    links = ''.join(f'<a href="{prefix}{path}">{label}</a>' for path, label in SUPPORT if path in available)
+    block = start + '<nav aria-label="サイトのご案内" style="display:flex;flex-wrap:wrap;gap:18px;margin-top:20px">' + links + '</nav>' + end
+    if start in text:
+        return re.sub(re.escape(start) + '.*?' + re.escape(end), lambda _: block, text, flags=re.S)
+    return text.replace('</footer>', block + '</footer>') if links else text
 
 
 def valid_articles(root):
@@ -77,10 +88,13 @@ main{max-width:900px;padding:40px 22px 70px;margin:auto}h1{font-size:34px}
     list_page += '<article class="article"><span class="tag">住まい・生活支援</span><h3><a href="pest-control-guide.html">家で害虫・害獣を見つけたら？</a></h3><p>安全に確認する手順と、専門業者に相談する際の確認項目。</p></article>'
     list_page += '<p><a href="sitemap.xml">検索エンジン向けのサイトマップ</a></p></main><footer>くらしの手帖</footer></body></html>'
     (root / 'article-list.html').write_text(set_canonical(list_page, BASE + 'article-list.html'), encoding='utf-8')
-    paths = ['pest-control-guide.html'] + [x['path'] for x in items]
-    for path in paths:
+    available = [path for path, _ in SUPPORT if (root / path).is_file()]
+    paths = ['pest-control-guide.html'] + [x['path'] for x in items] + available
+    for path in ['index.html', 'article-list.html'] + paths:
         file = root / path
-        file.write_text(set_canonical(file.read_text(encoding='utf-8'), BASE + path), encoding='utf-8')
+        text = set_canonical(file.read_text(encoding='utf-8'), BASE + ('' if path == 'index.html' else path))
+        text = support_links(text, '../' if path.startswith('articles/') else '', available)
+        file.write_text(text, encoding='utf-8')
     ET.register_namespace('', NS)
     sitemap = ET.Element('{' + NS + '}urlset')
     dated = {x['path']: x['checked_at'] for x in items}
