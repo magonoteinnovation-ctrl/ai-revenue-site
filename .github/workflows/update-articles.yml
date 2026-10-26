@@ -1,5 +1,13 @@
 name: 公式資料から記事を自動更新
 on:
+  push:
+    branches: [main]
+    paths:
+      - '*.html'
+      - 'articles.json'
+      - 'articles/**'
+      - 'scripts/**'
+      - '.github/workflows/update-articles.yml'
   schedule:
     - cron: '17 23 * * 0'
   workflow_dispatch:
@@ -17,14 +25,18 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: 自動更新と記事一覧の検証
+        run: python -m unittest discover -s scripts -p 'test_*.py'
       - name: 無料枠を確認して記事を生成
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_FREE_TIER_CONFIRMED: ${{ vars.GEMINI_FREE_TIER_CONFIRMED }}
         run: python scripts/update_articles.py
+      - name: 記事一覧と検索用サイトマップを更新
+        run: python scripts/build_publication.py
       - name: 検証済みの記事を保存
         run: |
-          git add articles.json automation-state.json
+          git add articles.json automation-state.json index.html pest-control-guide.html article-list.html sitemap.xml
           if [ -d articles ]; then git add articles; fi
           if git diff --cached --quiet; then exit 0; fi
           git config user.name "github-actions[bot]"
@@ -34,7 +46,7 @@ jobs:
       - name: 公開用ファイルだけを準備
         run: |
           mkdir -p _site
-          cp index.html pest-control-guide.html articles.json _site/
+          cp index.html pest-control-guide.html articles.json article-list.html sitemap.xml _site/
           if [ -d articles ]; then cp -R articles _site/; fi
       - uses: actions/upload-pages-artifact@v3
         with:
