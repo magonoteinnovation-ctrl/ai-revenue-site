@@ -13,7 +13,7 @@ class PublicationTests(unittest.TestCase):
             (root / 'articles').mkdir()
             (root / 'articles/example.html').write_text('<html><head></head><body>記事</body></html>')
             (root / 'pest-control-guide.html').write_text('<html><head></head></html>')
-            (root / 'index.html').write_text('<html><head></head><body><div id="automaticArticles" class="articles" aria-live="polite"></div><div class="footerlinks"></div></body></html>')
+            (root / 'index.html').write_text('<html><head></head><body><div id="automaticArticles" class="articles" aria-live="polite"></div><div class="footerlinks"></div><footer></footer></body></html>')
             (root / 'articles.json').write_text(json.dumps([{'path': 'articles/example.html', 'title': '<危険>', 'description': '掃除 & 住まい', 'checked_at': '2026-10-26'}]))
             build(root)
             before = (root / 'index.html').read_text()
