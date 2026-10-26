@@ -90,10 +90,11 @@ main{max-width:900px;padding:40px 22px 70px;margin:auto}h1{font-size:34px}
 <main><h1>暮らしに役立つ記事一覧</h1><p>公式資料をもとにした記事には、出典と資料の確認日を掲載しています。</p>'''
     list_page += cards(items)
     list_page += '<article class="article"><span class="tag">住まい・生活支援</span><h3><a href="pest-control-guide.html">家で害虫・害獣を見つけたら？</a></h3><p>安全に確認する手順と、専門業者に相談する際の確認項目。</p></article>'
+    list_page += '<article class="article"><span class="tag">片付け・整理</span><h3><a href="unwanted-items-guide.html">不用品の処分・買取ガイド</a></h3><p>買取、自治体処分、業者依頼を選ぶ前の確認事項。</p></article>'
     list_page += '<p><a href="sitemap.xml">検索エンジン向けのサイトマップ</a></p></main><footer>くらしの手帖</footer></body></html>'
     (root / 'article-list.html').write_text(set_canonical(list_page, BASE + 'article-list.html'), encoding='utf-8')
     available = [path for path, _ in SUPPORT if (root / path).is_file()]
-    paths = ['pest-control-guide.html'] + [x['path'] for x in items] + available
+    paths = ['pest-control-guide.html', 'unwanted-items-guide.html'] + [x['path'] for x in items] + available
     for path in ['index.html', 'article-list.html'] + paths:
         file = root / path
         text = set_canonical(file.read_text(encoding='utf-8'), BASE + ('' if path == 'index.html' else path))
