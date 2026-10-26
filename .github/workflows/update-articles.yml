@@ -1,0 +1,55 @@
+name: 公式資料から記事を自動更新
+on:
+  schedule:
+    - cron: '17 23 * * 0'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: update-articles
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 無料枠を確認して記事を生成
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_FREE_TIER_CONFIRMED: ${{ vars.GEMINI_FREE_TIER_CONFIRMED }}
+        run: python scripts/update_articles.py
+      - name: 検証済みの記事を保存
+        run: |
+          git add articles.json automation-state.json
+          if [ -d articles ]; then git add articles; fi
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "公式資料を確認して記事を更新"
+          git push
+      - name: 公開用ファイルだけを準備
+        run: |
+          mkdir -p _site
+          cp index.html pest-control-guide.html articles.json _site/
+          if [ -d articles ]; then cp -R articles _site/; fi
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+  deploy:
+    needs: update
+    permissions:
+      pages: write
+      id-token: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: サイトを公開
+        uses: actions/deploy-pages@v4
+        id: deployment
