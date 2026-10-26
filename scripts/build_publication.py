@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'https://magonoteinnovation-ctrl.github.io/ai-revenue-site/'
+OFFICIAL_URL = 'https://magonote-innovation.wixsite.com/benriya'
 START = '<!-- 自動記事一覧 開始 -->'
 END = '<!-- 自動記事一覧 終了 -->'
 NS = 'http://www.sitemaps.org/schemas/sitemap/0.9'
@@ -17,10 +18,10 @@ SUPPORT = [('request-memo.html', '作業依頼メモ'), ('about.html', 'この�
 def support_links(text, prefix, available):
     start, end = '<!-- 共通案内 開始 -->', '<!-- 共通案内 終了 -->'
     links = ''.join(f'<a href="{prefix}{path}">{label}</a>' for path, label in SUPPORT if path in available)
-    block = start + '<nav aria-label="サイトのご案内" style="display:flex;flex-wrap:wrap;gap:18px;margin-top:20px">' + links + '</nav>' + end
+    block = start + '<nav aria-label="サイトのご案内" style="display:flex;flex-wrap:wrap;gap:18px;margin-top:20px">' + links + f'<a href="{OFFICIAL_URL}">便利屋まごの手INNOVATION公式サイト</a>' + '</nav>' + end
     if start in text:
         return re.sub(re.escape(start) + '.*?' + re.escape(end), lambda _: block, text, flags=re.S)
-    return text.replace('</footer>', block + '</footer>') if links else text
+    return text.replace('</footer>', block + '</footer>') if '</footer>' in text else text
 
 
 def valid_articles(root):
@@ -90,10 +91,12 @@ main{max-width:900px;padding:40px 22px 70px;margin:auto}h1{font-size:34px}
 <main><h1>暮らしに役立つ記事一覧</h1><p>公式資料をもとにした記事には、出典と資料の確認日を掲載しています。</p>'''
     list_page += cards(items)
     list_page += '<article class="article"><span class="tag">住まい・生活支援</span><h3><a href="pest-control-guide.html">家で害虫・害獣を見つけたら？</a></h3><p>安全に確認する手順と、専門業者に相談する際の確認項目。</p></article>'
+    if (root / 'unwanted-items-guide.html').is_file():
+        list_page += '<article class="article"><span class="tag">片付け・整理</span><h3><a href="unwanted-items-guide.html">不用品の処分・買取ガイド</a></h3><p>買取、自治体処分、業者依頼を選ぶ前の確認事項。</p></article>'
     list_page += '<p><a href="sitemap.xml">検索エンジン向けのサイトマップ</a></p></main><footer>くらしの手帖</footer></body></html>'
     (root / 'article-list.html').write_text(set_canonical(list_page, BASE + 'article-list.html'), encoding='utf-8')
     available = [path for path, _ in SUPPORT if (root / path).is_file()]
-    paths = ['pest-control-guide.html'] + [x['path'] for x in items] + available
+    paths = [p for p in ['pest-control-guide.html', 'unwanted-items-guide.html'] if (root / p).is_file()] + [x['path'] for x in items] + available
     for path in ['index.html', 'article-list.html'] + paths:
         file = root / path
         text = set_canonical(file.read_text(encoding='utf-8'), BASE + ('' if path == 'index.html' else path))

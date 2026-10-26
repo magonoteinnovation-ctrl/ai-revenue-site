@@ -1,5 +1,7 @@
 name: Link check
 on:
+  pull_request:
+    branches: [main]
   workflow_dispatch:
   schedule:
     - cron: '20 0 * * *'
@@ -10,6 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Run publication tests
+        run: python3 -m unittest discover -s scripts -p 'test_*.py'
+      - name: Build publication
+        run: python3 scripts/build_publication.py
       - name: Check required pages
         run: |
           test -f index.html

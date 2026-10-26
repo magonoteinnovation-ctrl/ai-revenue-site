@@ -38,9 +38,14 @@ jobs:
         run: python scripts/build_publication.py
       - name: 公開前にリンクを検証
         run: python scripts/check_publication.py
+      - name: Wix公式サイトへのリンクを検証
+        run: |
+          for page in index.html article-list.html contact.html; do
+            grep -Fq 'https://magonote-innovation.wixsite.com/benriya' "$page" || { echo "公式サイトへのリンクがありません: $page"; exit 1; }
+          done
       - name: 検証済みの記事を保存
         run: |
-          git add articles.json automation-state.json index.html pest-control-guide.html article-list.html sitemap.xml about.html contact.html privacy.html request-memo.html site-support.css
+          git add articles.json automation-state.json index.html pest-control-guide.html unwanted-items-guide.html article-list.html sitemap.xml about.html contact.html privacy.html request-memo.html site-support.css
           if [ -d articles ]; then git add articles; fi
           if git diff --cached --quiet; then exit 0; fi
           git config user.name "github-actions[bot]"
@@ -50,7 +55,7 @@ jobs:
       - name: 公開用ファイルだけを準備
         run: |
           mkdir -p _site
-          cp index.html pest-control-guide.html articles.json article-list.html sitemap.xml about.html contact.html privacy.html request-memo.html site-support.css _site/
+          cp index.html pest-control-guide.html unwanted-items-guide.html articles.json article-list.html sitemap.xml about.html contact.html privacy.html request-memo.html site-support.css _site/
           if [ -d articles ]; then cp -R articles _site/; fi
       - uses: actions/upload-pages-artifact@v3
         with:
