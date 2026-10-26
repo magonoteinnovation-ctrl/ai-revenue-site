@@ -21,7 +21,7 @@ def support_links(text, prefix, available):
     block = start + '<nav aria-label="サイトのご案内" style="display:flex;flex-wrap:wrap;gap:18px;margin-top:20px">' + links + f'<a href="{OFFICIAL_URL}">便利屋まごの手INNOVATION公式サイト</a>' + '</nav>' + end
     if start in text:
         return re.sub(re.escape(start) + '.*?' + re.escape(end), lambda _: block, text, flags=re.S)
-    return text.replace('</footer>', block + '</footer>') if links else text
+    return text.replace('</footer>', block + '</footer>') if '</footer>' in text else text
 
 
 def valid_articles(root):
