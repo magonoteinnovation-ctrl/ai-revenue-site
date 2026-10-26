@@ -3,7 +3,7 @@ from pathlib import Path
 import tempfile
 import unittest
 import xml.etree.ElementTree as ET
-from build_publication import build, BASE, NS
+from build_publication import build, BASE, NS, OFFICIAL_URL
 
 
 class PublicationTests(unittest.TestCase):
@@ -22,6 +22,8 @@ class PublicationTests(unittest.TestCase):
             self.assertIn('&lt;危険&gt;', before)
             self.assertIn('href="articles/example.html"', before)
             self.assertEqual(before.count('rel="canonical"'), 1)
+            self.assertEqual(before.count(OFFICIAL_URL), 1)
+            self.assertNotIn(BASE + 'unwanted-items-guide.html', (root / 'sitemap.xml').read_text())
             urls = ET.parse(root / 'sitemap.xml').findall('{' + NS + '}url')
             locs = [x.find('{' + NS + '}loc').text for x in urls]
             self.assertEqual(len(locs), len(set(locs)))
