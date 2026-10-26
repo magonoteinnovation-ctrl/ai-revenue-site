@@ -16,3 +16,5 @@ jobs:
           test -f article-list.html
           test -f sitemap.xml
           test -f unwanted-items-guide.html
+      - name: Check internal links and anchors
+        run: python3 scripts/check_publication.py
