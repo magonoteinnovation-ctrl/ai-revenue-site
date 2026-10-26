@@ -133,7 +133,8 @@ main{max-width:900px;padding:40px 22px 70px;margin:auto}h1{font-size:34px}
         text = set_canonical(file.read_text(encoding='utf-8'), BASE + ('' if path == 'index.html' else path))
         text = support_links(text, '../' if path.startswith('articles/') else '', available)
         # 文字サイズ・コントラストの共通CSSを全ページに適用（再生成時も重複させない）
-        css_path = '../site-support.css' if path.startswith('articles/') else 'site-support.css'
+        # 案内ページ用のレイアウトCSSをトップに適用しない
+        css_path = '../readability.css' if path.startswith('articles/') else 'readability.css'
         css_tag = f'<link rel="stylesheet" href="{css_path}" data-site-readability="true">'
         text = re.sub(r'<link[^>]+data-site-readability="true"[^>]*>\n?', '', text)
         text = text.replace('</head>', css_tag + '\n</head>', 1)
