@@ -1,0 +1,31 @@
+/* 読みやすさ調整のみ（レイアウト・背景色は変更しない）。build_publication.pyが全ページに読み込ませる */
+/* サイト共通の読みやすさ改善：本文を大きくし、薄い文字のコントラストを確保 */
+html{font-size:18px;-webkit-text-size-adjust:100%}
+body{font-size:18px;line-height:1.85;color:#172a24}
+main p,main li,main td,main th,main label{font-size:18px;line-height:1.85;color:#20352c}
+main .lead,main .intro{font-size:20px;color:#29463a}
+main .small,main small,main .tag,main .meta{font-size:15px;color:#344f41}
+main h1{font-weight:800;line-height:1.4}
+main h2,main h3{font-weight:800;color:#172a24}
+main a{color:#185d40;text-decoration-thickness:1.5px}
+header a,footer a{font-size:16px}
+button,.button,input,select,textarea{font-size:18px}
+@media(max-width:650px){
+  html,body{font-size:17px}
+  main p,main li,main td,main th,main label{font-size:17px}
+  main .lead,main .intro{font-size:19px}
+  main .small,main small,main .tag,main .meta{font-size:15px}
+}
+
+/* トップページの小さなカード文字も読みやすく */
+main .card p,main .article p,main .notice,main .detail{font-size:17px;color:#294238;line-height:1.8}
+main .card h3,main .article h3{font-size:22px}
+main .tag,main .kicker{font-size:15px;color:#205c40}
+main .hero p,main .hero h1,main .about p,main .about h2{color:#fff}
+main .hero .eyebrow{color:#173b32}
+main .illus-note{font-size:17px;color:#fff}
+main .mini-tags span{font-size:15px}
+main .navlinks a{font-size:16px}
+header .logo span{font-size:13px}
+footer,footer small{color:#eef5f0}
+@media(max-width:650px){main .card p,main .article p,main .notice,main .detail{font-size:17px}}
