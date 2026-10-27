@@ -100,6 +100,30 @@ class UpdateTests(unittest.TestCase):
         self.assertEqual(listing[0]['category'], updater.SOURCES[0]['category'])
         self.assertLessEqual(len(listing[0]['description']), 110)
 
+    def test_fetch_failure_keeps_files_and_reports(self):
+        with patch.dict('os.environ', {'GEMINI_FREE_TIER_CONFIRMED': 'true', 'GEMINI_API_KEY': 'test'}, clear=True), patch.object(updater, 'fetch_source', side_effect=urllib.error.URLError('down')), patch.object(updater, 'generate') as generate:
+            with self.assertRaises(RuntimeError):
+                updater.main()
+            generate.assert_not_called()
+        self.assertEqual(json.loads((self.root / 'articles.json').read_text()), [])
+        self.assertFalse((self.root / 'articles').exists())
+
+    def test_repeated_runs_do_not_duplicate_listing(self):
+        env = {'GEMINI_FREE_TIER_CONFIRMED': 'true', 'GEMINI_API_KEY': 'test'}
+        for changed in ('一回目の資料', '二回目の資料'):
+            text = SOURCE + changed
+            with patch.dict('os.environ', env, clear=True), patch.object(updater, 'fetch_source', return_value=text), patch.object(updater, 'generate', return_value=ARTICLE):
+                updater.main()
+        listing = json.loads((self.root / 'articles.json').read_text())
+        paths = [x['path'] for x in listing]
+        self.assertEqual(len(paths), len(set(paths)))
+
+    def test_manual_article_is_skipped_even_if_listed(self):
+        manual = {'slug': 'house-cleaning-checklist', 'title': '手書き', 'url': 'https://www.kokusen.go.jp/x', 'category': '掃除・お手入れ'}
+        with patch.object(updater, 'SOURCES', [manual]), patch.dict('os.environ', {'GEMINI_FREE_TIER_CONFIRMED': 'true', 'GEMINI_API_KEY': 'test'}, clear=True), patch.object(updater, 'fetch_source') as fetch:
+            updater.main()
+            fetch.assert_not_called()
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -172,9 +172,18 @@ def main():
     listing = json.loads((ROOT / 'articles.json').read_text())
     day = datetime.now(ZoneInfo('Asia/Tokyo')).date().isoformat()
     updated = False
+    failures = []
     for source in SOURCES:
+        if source['slug'] in MANUAL_ARTICLES:
+            continue  # 手書き管理の記事は絶対に再生成しない
         print('公式資料を確認：' + source['slug'], flush=True)
-        text = fetch_source(source['url'])
+        try:
+            text = fetch_source(source['url'])
+        except (urllib.error.URLError, ValueError, OSError) as error:
+            # 1つの資料の取得に失敗しても、他の資料の確認は続ける
+            print(f'資料を取得できませんでした（{source["slug"]}：{type(error).__name__}）。')
+            failures.append(source['slug'])
+            continue
         digest = hashlib.sha256(normalize(text).encode()).hexdigest()
         if state.get(source['slug'], {}).get('hash') == digest:
             continue
@@ -197,8 +206,10 @@ def main():
         for path, value in ((state_path, state), (ROOT / 'articles.json', listing)):
             path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
         print('根拠を確認できた記事を1件更新しました。')
-    else:
+    elif not failures:
         print('資料に変更がないため、APIを呼ばず終了しました。')
+    if failures:
+        raise RuntimeError('資料を取得できなかったもの：' + '、'.join(failures))
 
 
 if __name__ == '__main__':
@@ -210,6 +221,9 @@ if __name__ == '__main__':
         sys.exit(1)
     except ValueError as error:
         print('記事の検証により更新を中止しました：' + str(error))
+        sys.exit(1)
+    except RuntimeError as error:
+        print(str(error) + '。既存の記事は維持します。')
         sys.exit(1)
     except Exception as error:
         print(f'更新を中止しました（{type(error).__name__}）。公開済みの記事は維持します。')

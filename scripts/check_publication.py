@@ -2,6 +2,8 @@
 from pathlib import Path
 from html.parser import HTMLParser
 from urllib.parse import urlsplit, unquote
+import json
+import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,6 +21,40 @@ class Page(HTMLParser):
         key = 'href' if tag in ('a', 'link') else 'src' if tag in ('img', 'script') else None
         if key and attrs.get(key):
             self.refs.append(attrs[key])
+
+# 掲載を承認済みのA8.net広告（a8mat の値）。新しい案件は提携承認を確認してからここに追加する。
+APPROVED_A8 = {'4BEPPP+7WL8PM+4X26+TRVYQ'}
+
+
+def seo_errors(name, text):
+    """公開ページのSEO情報・広告表記が壊れていないかを確認する。"""
+    errors = []
+    if len(re.findall(r'<title>', text)) != 1:
+        errors.append(f'{name}: titleが1つではありません')
+    if len(re.findall(r'rel=["\']canonical["\']', text)) != 1:
+        errors.append(f'{name}: canonicalが1つではありません')
+    desc = re.search(r'<meta name="description" content="([^"]*)"', text)
+    if not desc or not desc.group(1).strip():
+        errors.append(f'{name}: meta descriptionがありません')
+    elif len(desc.group(1)) > 160:
+        errors.append(f'{name}: meta descriptionが長すぎます（{len(desc.group(1))}字）')
+    if len(re.findall(r'<h1[\s>]', text)) != 1:
+        errors.append(f'{name}: h1が1つではありません')
+    for block in re.findall(r'<script type="application/ld\+json">(.*?)</script>', text, re.S):
+        try:
+            json.loads(block)
+        except ValueError:
+            errors.append(f'{name}: 構造化データのJSONが壊れています')
+    for tag in re.findall(r'<a\b[^>]*href="https?://px\.a8\.net/[^"]*"[^>]*>', text):
+        if 'sponsored' not in tag:
+            errors.append(f'{name}: A8.netの広告リンクに rel="sponsored" がありません')
+        mat = re.search(r'a8mat=([^"&]+)', tag)
+        if not mat or mat.group(1) not in APPROVED_A8:
+            errors.append(f'{name}: 承認済み一覧にないA8.net広告リンクがあります')
+    if 'a8.net' in text and not re.search(r'広告|PR', text):
+        errors.append(f'{name}: 広告リンクがあるのに「広告」「PR」の表示がありません')
+    return errors
+
 
 def check(root=ROOT):
     root = root.resolve()
@@ -44,6 +80,8 @@ def check(root=ROOT):
                 errors.append(f'{file.relative_to(root)}: リンク先がありません {ref}')
             elif url.fragment and target in pages and unquote(url.fragment) not in pages[target].ids:
                 errors.append(f'{file.relative_to(root)}: ページ内の移動先がありません {ref}')
+    for file in pages:
+        errors.extend(seo_errors(str(file.relative_to(root)), file.read_text(encoding='utf-8')))
     if errors:
         for error in errors:
             print(error)
