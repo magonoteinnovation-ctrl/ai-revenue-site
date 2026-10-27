@@ -81,6 +81,11 @@ class UpdateTests(unittest.TestCase):
         self.assertNotIn('GEMINI_API_KEY', page)
         self.assertIn('AIで要約', page)
 
+    def test_manual_articles_are_not_regenerated(self):
+        slugs = {s['slug'] for s in updater.SOURCES}
+        self.assertFalse(slugs & updater.MANUAL_ARTICLES)
+        self.assertIn('house-cleaning-checklist', updater.MANUAL_ARTICLES)
+
 
 if __name__ == '__main__':
     unittest.main()
