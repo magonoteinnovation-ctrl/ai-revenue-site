@@ -65,3 +65,6 @@ body :is(main h3 > a,main h3 + p + a,main p > a:only-child:not(.button):not(.btn
 .related li a{font-weight:700;padding-block:6px}
 .related .tag{display:block;font-size:14px;color:#344f41;margin-top:2px}
 .related p{margin:14px 0 0}
+
+/* 広告を含むページの上部表記（ステルスマーケティング対策） */
+.pr-note{display:inline-block;margin:4px 0 8px;padding:6px 12px;border:1px solid #c9d8cc;border-radius:8px;background:#fff;font-size:15px;color:#344f41}

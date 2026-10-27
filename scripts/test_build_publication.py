@@ -129,6 +129,18 @@ class PublicationTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 build(root)
 
+    def test_pr_note_only_on_pages_with_ads(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._site(root)
+            guide = (root / 'pest-control-guide.html').read_text()
+            guide = guide.replace('<main>', '<main><h1>害虫</h1><a href="https://px.a8.net/svt/ejp?a8mat=X" rel="nofollow sponsored">広告</a>')
+            (root / 'pest-control-guide.html').write_text(guide)
+            build(root)
+            build(root)
+            self.assertEqual((root / 'pest-control-guide.html').read_text().count('class="pr-note"'), 1)
+            self.assertNotIn('pr-note', (root / 'articles/a.html').read_text())
+
     def test_page_date(self):
         self.assertEqual(page_date('資料確認日：2026年10月27日。掲載日：2026年10月20日'), '2026-10-27')
         self.assertEqual(page_date('2026年10月26日公開'), '2026-10-26')

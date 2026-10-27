@@ -109,6 +109,20 @@ def related_block(path, entries, limit=3):
             f'</ul><p><a href="{prefix}article-list.html">記事一覧を見る</a></p></section>' + RELATED_END)
 
 
+PR_START, PR_END = '<!-- 広告表記 開始 -->', '<!-- 広告表記 終了 -->'
+PR_NOTE = (PR_START + '<p class="pr-note">このページには広告（PR）を含みます。広告の有無にかかわらず、'
+           '確認事項は公的資料などをもとに整理しています。</p>' + PR_END)
+
+
+def set_pr_note(text):
+    """広告リンクを含む記事ページでは、ページ上部に広告を含む旨を表示する（なければ取り除く）。"""
+    text = re.sub(re.escape(PR_START) + '.*?' + re.escape(PR_END), '', text, flags=re.S)
+    body = text.split('<body', 1)[-1]
+    if 'px.a8.net' in body and '</h1>' in text:
+        text = text.replace('</h1>', '</h1>' + PR_NOTE, 1)
+    return text
+
+
 def set_related(text, block):
     text = re.sub(re.escape(RELATED_START) + '.*?' + re.escape(RELATED_END), '', text, flags=re.S)
     return text.replace('</main>', block + '</main>', 1) if block else text
@@ -220,6 +234,7 @@ main{max-width:900px;padding:40px 22px 70px;margin:auto}h1{font-size:34px}
         kind = 'article' if path.startswith('articles/') or path in GUIDE_PATHS else 'page'
         if kind == 'article':
             text = set_related(text, related_block(path, entries))
+            text = set_pr_note(text)
         text = seo_meta(text, BASE + ('' if path == 'index.html' else path), kind, dated_items.get(path), image)
         file.write_text(text, encoding='utf-8')
     ET.register_namespace('', NS)
