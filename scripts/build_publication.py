@@ -8,6 +8,8 @@ import xml.etree.ElementTree as ET
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'https://magonoteinnovation-ctrl.github.io/ai-revenue-site/'
 OFFICIAL_URL = 'https://magonote-innovation.wixsite.com/benriya'
+# 運営会社の公式SNS（Wix公式サイトに掲載されているアカウント）
+SNS_LINKS = [('Instagram', 'https://www.instagram.com/magonoteinnovation/'), ('X（旧Twitter）', 'https://x.com/benriyamagonote')]
 GUIDE_PATHS = ('pest-control-guide.html', 'unwanted-items-guide.html')
 # カテゴリー（トップの「お悩みから探す」と同じ3分類）。記事一覧の見出しと関連記事に使う。
 CATEGORIES = [('katazuke', '片付け・整理'), ('souji', '掃除・お手入れ'), ('sumai', '住まい・生活支援')]
@@ -32,7 +34,8 @@ SUPPORT = [('request-memo.html', '作業依頼メモ'), ('about.html', 'この�
 def support_links(text, prefix, available):
     start, end = '<!-- 共通案内 開始 -->', '<!-- 共通案内 終了 -->'
     links = ''.join(f'<a href="{prefix}{path}">{label}</a>' for path, label in SUPPORT if path in available)
-    block = start + '<nav aria-label="サイトのご案内" style="display:flex;flex-wrap:wrap;gap:18px;margin-top:20px">' + links + f'<a href="{OFFICIAL_URL}">便利屋まごの手INNOVATION公式サイト</a>' + '</nav>' + end
+    block = start + '<nav aria-label="サイトのご案内" style="display:flex;flex-wrap:wrap;gap:18px;margin-top:20px">' + links + f'<a href="{OFFICIAL_URL}">便利屋まごの手INNOVATION公式サイト</a>' + ''.join(
+        f'<a href="{url}" rel="noopener">公式{label}</a>' for label, url in SNS_LINKS) + '</nav>' + end
     if start in text:
         return re.sub(re.escape(start) + '.*?' + re.escape(end), lambda _: block, text, flags=re.S)
     return text.replace('</footer>', block + '</footer>') if '</footer>' in text else text

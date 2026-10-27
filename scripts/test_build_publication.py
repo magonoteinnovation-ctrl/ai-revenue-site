@@ -3,7 +3,7 @@ from pathlib import Path
 import tempfile
 import unittest
 import xml.etree.ElementTree as ET
-from build_publication import build, BASE, NS, OFFICIAL_URL, page_date
+from build_publication import build, BASE, NS, OFFICIAL_URL, SNS_LINKS, page_date
 
 
 class PublicationTests(unittest.TestCase):
@@ -140,6 +140,17 @@ class PublicationTests(unittest.TestCase):
             build(root)
             self.assertEqual((root / 'pest-control-guide.html').read_text().count('class="pr-note"'), 1)
             self.assertNotIn('pr-note', (root / 'articles/a.html').read_text())
+
+    def test_footer_has_official_sns_once(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._site(root)
+            build(root)
+            build(root)
+            for name in ('index.html', 'article-list.html', 'articles/a.html'):
+                text = (root / name).read_text()
+                for _, url in SNS_LINKS:
+                    self.assertEqual(text.count(url), 1, name)
 
     def test_page_date(self):
         self.assertEqual(page_date('資料確認日：2026年10月27日。掲載日：2026年10月20日'), '2026-10-27')
