@@ -15,11 +15,11 @@ from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 MODEL = 'gemini-3.5-flash-lite'
+# house-cleaning-checklist は手書き管理に移行したため、自動生成の対象外（上書き防止）。
+MANUAL_ARTICLES = {'house-cleaning-checklist'}
 SOURCES = [
     {'slug': 'cleaning-product-safety', 'title': '掃除用洗浄剤を使う前に確認したいこと',
      'url': 'https://www.kokusen.go.jp/news/data/n-20260318_1.html'},
-    {'slug': 'house-cleaning-checklist', 'title': 'ハウスクリーニングを依頼する前の確認事項',
-     'url': 'https://www.kokusen.go.jp/news/data/n-20250228_1.html'},
 ]
 
 
