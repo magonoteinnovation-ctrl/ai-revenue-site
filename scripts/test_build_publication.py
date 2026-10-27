@@ -3,7 +3,7 @@ from pathlib import Path
 import tempfile
 import unittest
 import xml.etree.ElementTree as ET
-from build_publication import build, BASE, NS, OFFICIAL_URL
+from build_publication import build, BASE, NS, OFFICIAL_URL, SNS_LINKS, page_date
 
 
 class PublicationTests(unittest.TestCase):
@@ -72,6 +72,90 @@ class PublicationTests(unittest.TestCase):
             self.assertEqual(index.count('href="readability.css"'), 1)
             self.assertNotIn('site-support.css', index)
             self.assertEqual((root / 'articles/example.html').read_text().count('href="../readability.css"'), 1)
+
+    def _site(self, root):
+        (root / 'articles').mkdir()
+        page = '<html><head><title>{t}｜くらしの手帖</title><meta name="description" content="説明"></head><body><main>{b}</main><footer>f</footer></body></html>'
+        (root / 'articles/a.html').write_text(page.format(t='記事A', b='本文'))
+        (root / 'articles/b.html').write_text(page.format(t='記事B', b='本文'))
+        (root / 'unwanted-items-guide.html').write_text(page.format(t='不用品', b='資料確認日：2026年10月27日'))
+        (root / 'pest-control-guide.html').write_text(page.format(t='害虫', b='2026年10月26日公開'))
+        (root / 'index.html').write_text('<html><head><title>トップ</title></head><body><div id="automaticArticles" class="articles" aria-live="polite"></div><footer><div class="footerlinks"></div></footer></body></html>')
+        (root / 'articles.json').write_text(json.dumps([
+            {'path': 'articles/a.html', 'title': '記事A', 'description': 'd', 'checked_at': '2026-10-20', 'category': '掃除・お手入れ'},
+            {'path': 'articles/b.html', 'title': '記事B', 'description': 'd', 'checked_at': '2026-10-21', 'category': '片付け・整理'}]))
+
+    def test_related_links_categories_and_breadcrumbs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._site(root)
+            build(root)
+            build(root)
+            b = (root / 'articles/b.html').read_text()
+            # 関連記事は1回だけ、同じカテゴリー（片付け・整理）の不用品ガイドが先頭
+            self.assertEqual(b.count('<!-- 関連記事 開始 -->'), 1)
+            related = b.split('<!-- 関連記事 開始 -->')[1]
+            self.assertLess(related.index('../unwanted-items-guide.html'), related.index('../articles/a.html'))
+            self.assertNotIn('href="../articles/b.html"', related)
+            self.assertIn('"BreadcrumbList"', b)
+            listing = (root / 'article-list.html').read_text()
+            self.assertIn('id="cat-katazuke"', listing)
+            self.assertIn('<h2>掃除・お手入れ</h2>', listing)
+            self.assertNotIn('<h3>', listing.split('<h1>')[0])
+            # 手書きガイドの日付がサイトマップと構造化データに入る
+            sitemap = (root / 'sitemap.xml').read_text()
+            self.assertIn('unwanted-items-guide.html</loc><lastmod>2026-10-27', sitemap)
+            self.assertIn('pest-control-guide.html</loc><lastmod>2026-10-26', sitemap)
+
+    def test_og_image_only_when_file_exists(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._site(root)
+            build(root)
+            self.assertNotIn('og:image', (root / 'articles/a.html').read_text())
+            (root / 'og-image.png').write_bytes(b'png')
+            build(root)
+            a = (root / 'articles/a.html').read_text()
+            self.assertEqual(a.count('property="og:image"'), 1)
+            self.assertIn('summary_large_image', a)
+
+    def test_invalid_category_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._site(root)
+            items = json.loads((root / 'articles.json').read_text())
+            items[0]['category'] = '存在しない分類'
+            (root / 'articles.json').write_text(json.dumps(items))
+            with self.assertRaises(ValueError):
+                build(root)
+
+    def test_pr_note_only_on_pages_with_ads(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._site(root)
+            guide = (root / 'pest-control-guide.html').read_text()
+            guide = guide.replace('<main>', '<main><h1>害虫</h1><a href="https://px.a8.net/svt/ejp?a8mat=X" rel="nofollow sponsored">広告</a>')
+            (root / 'pest-control-guide.html').write_text(guide)
+            build(root)
+            build(root)
+            self.assertEqual((root / 'pest-control-guide.html').read_text().count('class="pr-note"'), 1)
+            self.assertNotIn('pr-note', (root / 'articles/a.html').read_text())
+
+    def test_footer_has_official_sns_once(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._site(root)
+            build(root)
+            build(root)
+            for name in ('index.html', 'article-list.html', 'articles/a.html'):
+                text = (root / name).read_text()
+                for _, url in SNS_LINKS:
+                    self.assertEqual(text.count(url), 1, name)
+
+    def test_page_date(self):
+        self.assertEqual(page_date('資料確認日：2026年10月27日。掲載日：2026年10月20日'), '2026-10-27')
+        self.assertEqual(page_date('2026年10月26日公開'), '2026-10-26')
+        self.assertIsNone(page_date('日付なし'))
 
 
 if __name__ == '__main__':
