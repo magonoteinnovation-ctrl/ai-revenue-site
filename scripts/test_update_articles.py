@@ -86,6 +86,20 @@ class UpdateTests(unittest.TestCase):
         self.assertFalse(slugs & updater.MANUAL_ARTICLES)
         self.assertIn('house-cleaning-checklist', updater.MANUAL_ARTICLES)
 
+    def test_summary_is_short_and_ends_at_sentence(self):
+        long_text = '最初の文はここで終わります。' * 12
+        result = updater.summary(long_text)
+        self.assertLessEqual(len(result), 110)
+        self.assertTrue(result.endswith('。'))
+        self.assertEqual(updater.summary('短い文。'), '短い文。')
+
+    def test_new_listing_keeps_category(self):
+        with patch.dict('os.environ', {'GEMINI_FREE_TIER_CONFIRMED': 'true', 'GEMINI_API_KEY': 'test'}, clear=True), patch.object(updater, 'fetch_source', return_value=SOURCE), patch.object(updater, 'generate', return_value=ARTICLE):
+            updater.main()
+        listing = json.loads((self.root / 'articles.json').read_text())
+        self.assertEqual(listing[0]['category'], updater.SOURCES[0]['category'])
+        self.assertLessEqual(len(listing[0]['description']), 110)
+
 
 if __name__ == '__main__':
     unittest.main()

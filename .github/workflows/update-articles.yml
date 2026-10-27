@@ -6,6 +6,7 @@ on:
       - '*.html'
       - 'site-support.css'
       - 'readability.css'
+      - '*.png'
       - 'articles.json'
       - 'articles/**'
       - 'scripts/**'
@@ -54,8 +55,9 @@ jobs:
           done
       - name: 検証済みの記事を保存
         run: |
-          git add articles.json automation-state.json index.html pest-control-guide.html unwanted-items-guide.html article-list.html sitemap.xml about.html contact.html privacy.html request-memo.html site-support.css readability.css
-          if [ -d articles ]; then git add articles; fi
+          # 新しいページやCSS・画像を追加しても保存漏れがないよう、公開対象をまとめて指定する
+          git add -A -- articles.json automation-state.json sitemap.xml ':(glob)*.html' ':(glob)*.css' ':(glob)*.png'
+          if [ -d articles ]; then git add -A -- articles; fi
           if git diff --cached --quiet; then exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -69,8 +71,11 @@ jobs:
       - name: 公開用ファイルだけを準備
         run: |
           mkdir -p _site
-          cp index.html pest-control-guide.html unwanted-items-guide.html articles.json article-list.html sitemap.xml about.html contact.html privacy.html request-memo.html site-support.css readability.css _site/
+          # 公開対象：トップ直下のHTML・CSS・画像・一覧データと articles/ 以下（Markdownや scripts は公開しない）
+          cp ./*.html ./*.css articles.json sitemap.xml _site/
+          for f in ./*.png; do [ -e "$f" ] && cp "$f" _site/; done
           if [ -d articles ]; then cp -R articles _site/; fi
+          test -f _site/index.html && test -f _site/readability.css
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

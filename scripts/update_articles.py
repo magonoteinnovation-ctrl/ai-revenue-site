@@ -19,7 +19,7 @@ MODEL = 'gemini-3.5-flash-lite'
 MANUAL_ARTICLES = {'house-cleaning-checklist'}
 SOURCES = [
     {'slug': 'cleaning-product-safety', 'title': '掃除用洗浄剤を使う前に確認したいこと',
-     'url': 'https://www.kokusen.go.jp/news/data/n-20260318_1.html'},
+     'url': 'https://www.kokusen.go.jp/news/data/n-20260318_1.html', 'category': '掃除・お手入れ'},
 ]
 
 
@@ -133,13 +133,22 @@ def validate(article, source_text):
         raise ValueError('日本語の記事ではありません')
 
 
+def summary(text, limit=110):
+    """一覧・meta description用に、文の区切りで110字以内に整える。"""
+    if len(text) <= limit:
+        return text
+    cut = text[:limit]
+    end = cut.rfind('。')
+    return cut[:end + 1] if end >= 40 else cut.rstrip('、') + '…'
+
+
 def render(article, source, day):
     e = html.escape
     sections = ''.join('<section><h2>' + e(s['heading']) + '</h2><p>' +
                        e(s['text']) + '</p></section>' for s in article['sections'])
     return f'''<!doctype html><html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="{e(article['sections'][0]['text'], quote=True)}">
+<meta name="description" content="{e(summary(article['sections'][0]['text']), quote=True)}">
 <title>{e(article['title'])}｜くらしの手帖</title>
 <style>body{{margin:0;background:#faf8f2;color:#1b2d29;font-family:Meiryo,sans-serif;line-height:1.95}}header,footer{{padding:24px;background:#173b32;color:white}}header a,footer a{{color:white}}main{{max-width:780px;margin:auto;padding:40px 22px 70px}}h1{{font-size:clamp(26px,5vw,40px);line-height:1.5}}h2{{margin-top:36px;font-size:23px}}aside{{padding:20px;background:#edf3e9;border-radius:12px;margin:28px 0}}a{{color:#276a4c}}small{{color:#566b60}}</style></head>
 <body><header><a href="../index.html">くらしの手帖｜トップへ戻る</a></header>
@@ -177,7 +186,8 @@ def main():
         (ROOT / path).write_text(render(article, source, day), encoding='utf-8')
         listing = [x for x in listing if x['path'] != path]
         listing.insert(0, {'path': path, 'title': article['title'],
-                          'description': article['sections'][0]['text'], 'checked_at': day})
+                          'description': summary(article['sections'][0]['text']), 'checked_at': day,
+                          'category': source.get('category', '住まい・生活支援')})
         state[source['slug']] = {'hash': digest, 'checked_at': day,
                                 'source': source['url'], 'model': MODEL,
                                 'evidence': [s['evidence'] for s in article['sections']]}
