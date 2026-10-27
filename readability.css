@@ -29,3 +29,12 @@ main .navlinks a{font-size:16px}
 header .logo span{font-size:13px}
 footer,footer small{color:#eef5f0}
 @media(max-width:650px){main .card p,main .article p,main .notice,main .detail{font-size:17px}}
+
+/* 検索ボタンの改行と幅の崩れを防止（既存の配色は維持） */
+.searchbox{width:100%;min-width:0}
+.searchbox input{flex:1 1 auto;min-width:0;width:auto}
+.searchbox button{flex:0 0 auto;white-space:nowrap;min-width:72px}
+.searchbox button{writing-mode:horizontal-tb;word-break:keep-all}
+.section-head>div{min-width:0}
+.section h2,.article h3,.card h3{overflow-wrap:anywhere}
+@media(max-width:800px){.searchbox{max-width:100%}}
