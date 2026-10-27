@@ -38,3 +38,13 @@ footer,footer small{color:#eef5f0}
 .section-head>div{min-width:0}
 .section h2,.article h3,.card h3{overflow-wrap:anywhere}
 @media(max-width:800px){.searchbox{max-width:100%}}
+
+/* 日本語の改行を整える（既存の色・大きさ・配置は変更しない）
+   見出し・説明文・ラベルなど短い文は、文節の途中で折り返さない（Chrome・Edge 119以降で有効。他のブラウザは従来どおり） */
+body :is(h1,h2,h3,h4,.lead,.tag,.kicker,.eyebrow,.illus-title,.illus-note,label,legend,th,summary,.notice strong,.card strong){word-break:auto-phrase;text-wrap:pretty}
+/* 本文は従来どおり詰めて組み、最終行が1〜2文字だけになるのを防ぐ */
+body :is(p,li,dd,.note,.detail){line-break:strict;text-wrap:pretty}
+/* ナビゲーションとフッターの短いリンクは途中で折り返さない */
+body :is(nav a,.navlinks a,.footerlinks a,footer a:not([href^="http"])){white-space:nowrap}
+/* 1行に収めたい語句（HTML側で class="nobr" を付けた部分）は途中で折り返さない */
+.nobr{white-space:nowrap}
