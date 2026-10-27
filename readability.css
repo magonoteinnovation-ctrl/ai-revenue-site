@@ -51,3 +51,7 @@ body :is(nav a,.navlinks a,.footerlinks a,footer a:not([href^="http"])){white-sp
 
 /* 幅320px前後の小さいスマホで、フッターの長いリンク（公式サイト名）がはみ出さないようにする */
 @media (max-width:360px){body footer nav a[href]{white-space:normal}}
+/* リンク・ボタンの押しやすさ（見た目の配置は変えずに、押せる範囲だけを上下に広げる）
+   行をまたいで隣のリンクと押せる範囲が重ならないよう、横並び・単独で置かれたリンクに限定する */
+body :is(header a:not(.logo),footer nav a,nav a,.navlinks a,.footerlinks a,.card > a:not(.button):not(.btn),.article > a:not(.button):not(.btn),.article button){padding-block:10px;margin-block:-10px}
+body :is(main h3 > a,main h3 + p + a,main p > a:only-child:not(.button):not(.btn)){padding-block:6px}
