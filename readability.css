@@ -48,3 +48,6 @@ body :is(p,li,dd,.note,.detail){line-break:strict;text-wrap:pretty}
 body :is(nav a,.navlinks a,.footerlinks a,footer a:not([href^="http"])){white-space:nowrap}
 /* 1行に収めたい語句（HTML側で class="nobr" を付けた部分）は途中で折り返さない */
 .nobr{white-space:nowrap}
+
+/* 幅320px前後の小さいスマホで、フッターの長いリンク（公式サイト名）がはみ出さないようにする */
+@media (max-width:360px){body footer nav a[href]{white-space:normal}}
