@@ -7,6 +7,7 @@ on:
       - 'site-support.css'
       - 'readability.css'
       - '*.png'
+      - 'robots.txt'
       - 'articles.json'
       - 'articles/**'
       - 'scripts/**'
@@ -82,6 +83,8 @@ jobs:
           # 公開対象：トップ直下のHTML・CSS・画像・一覧データと articles/ 以下（Markdownや scripts は公開しない）
           cp ./*.html ./*.css articles.json sitemap.xml _site/
           for f in ./*.png; do [ -e "$f" ] && cp "$f" _site/; done
+          # 検索エンジン向けの robots.txt も公開する（サイトマップの場所を伝える）
+          if [ -f robots.txt ]; then cp robots.txt _site/; fi
           if [ -d articles ]; then cp -R articles _site/; fi
           test -f _site/index.html && test -f _site/readability.css
       - uses: actions/upload-pages-artifact@v3
