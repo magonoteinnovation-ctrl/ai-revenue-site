@@ -218,7 +218,7 @@ main{max-width:900px;padding:40px 22px 70px;margin:auto}h1{font-size:34px}
         group = [x for x in entries if x['category'] == name]
         if group:
             list_page += f'<section id="cat-{key}"><h2>{e(name)}</h2>' + cards(group) + '</section>'
-    list_page += '<p><a href="sitemap.xml">検索エンジン向けのサイトマップ</a></p></main><footer>くらしの手帖</footer></body></html>'
+    list_page += '</main><footer>くらしの手帖</footer></body></html>'
     (root / 'article-list.html').write_text(set_canonical(list_page, BASE + 'article-list.html'), encoding='utf-8')
     available = [path for path, _ in SUPPORT if (root / path).is_file()]
     dated_items = {x['path']: x['checked_at'] for x in items}
