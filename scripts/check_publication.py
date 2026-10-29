@@ -26,7 +26,12 @@ class Page(HTMLParser):
 APPROVED_A8 = {'4BEPPP+7WL8PM+4X26+TRVYQ',
                '4BERA4+2WSC0Q+4JGQ+BX3J6',  # マネーフォワード クラウド確定申告（2026-10-29提携）
                '45K6H2+8JT5AY+348+64Z8Y',  # ロリポップ！（くらしの手帖掲載用）
-               '4BERA4+34IYVU+2PEO+6C1VM'}  # ココナラ出品者募集（2026-10-29提携）
+               '4BERA4+34IYVU+2PEO+6C1VM',  # ココナラ出品者募集（2026-10-29提携）
+               # バナー素材（2026-10-29 A8管理画面「広告リンク作成」で掲載サイト＝くらしの手帖を選んで取得）
+               '4BEPPP+7WL8PM+4X26+TSJ41',  # FireWorks 300x250
+               '4BERA4+2WSC0Q+4JGQ+BYDTT',  # マネーフォワード クラウド確定申告 300x250
+               '4BERA4+34IYVU+2PEO+64C3L',  # ココナラ 300x250
+               '45K6H2+8JT5AY+348+6EMGX'}  # ロリポップ！ 336x280
 
 
 def seo_errors(name, text):
