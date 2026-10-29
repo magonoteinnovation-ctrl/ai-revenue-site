@@ -67,6 +67,46 @@ def seo_errors(name, text):
     return errors
 
 
+
+def app_errors(root):
+    """アプリ版（app/）のマニフェスト・アイコン・内部リンクと、広告リンクを置いていないことを確認する。"""
+    app = root / 'app'
+    if not app.is_dir():
+        return []
+    errors = []
+    page = app / 'index.html'
+    if not page.is_file():
+        return ['app: index.html がありません']
+    text = page.read_text(encoding='utf-8')
+    try:
+        manifest = json.loads((app / 'manifest.webmanifest').read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        return ['app: manifest.webmanifest が読めません']
+    for key in ('name', 'short_name', 'start_url', 'scope', 'display', 'icons'):
+        if not manifest.get(key):
+            errors.append(f'app: manifest に {key} がありません')
+    sizes = {i.get('sizes') for i in manifest.get('icons', [])}
+    if not {'192x192', '512x512'} <= sizes:
+        errors.append('app: 192x192 と 512x512 のアイコンが必要です')
+    for icon in manifest.get('icons', []):
+        if not (app / icon.get('src', '')).is_file():
+            errors.append(f"app: アイコンがありません {icon.get('src')}")
+    if 'rel="manifest"' not in text:
+        errors.append('app: index.html に manifest のリンクがありません')
+    # アプリ版には広告（アフィリエイト）リンクを置かない（各提携先のアプリ利用条件を確認するまで）
+    if re.search(r'a8\.net|amazon\.co\.jp|amzn\.|rakuten', text):
+        errors.append('app: アプリ版の画面に広告・ショッピングサイトへのリンクがあります')
+    for ref in re.findall(r'(?:href|src)="([^"]+)"', text):
+        url = urlsplit(ref)
+        if url.scheme or url.netloc or not url.path:
+            continue
+        target = (app / unquote(url.path)).resolve()
+        if not target.is_relative_to(root):
+            errors.append(f'app: 公開範囲外のリンク {ref}')
+        elif not target.is_file():
+            errors.append(f'app: リンク先がありません {ref}')
+    return errors
+
 def check(root=ROOT):
     root = root.resolve()
     files = sorted(root.glob('*.html')) + sorted((root / 'articles').glob('*.html'))
@@ -107,6 +147,7 @@ def check(root=ROOT):
             errors.append('index.html: Amazonアソシエイトの導線がないか、トラッキングID・開示文言・PR表記が欠けています')
         elif top.find('id="categories"') > top.find('<!-- Amazonトップ（アソシエイト）開始 -->'):
             errors.append('index.html: Amazonの導線が「気になるテーマを選ぶ」より上にあります')
+    errors.extend(app_errors(root))
     for file in pages:
         errors.extend(seo_errors(str(file.relative_to(root)), file.read_text(encoding='utf-8')))
     if errors:
