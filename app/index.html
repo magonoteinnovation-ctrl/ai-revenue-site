@@ -31,6 +31,12 @@ main{max-width:720px;margin:0 auto;padding:18px 16px 40px}
 .tile .t{font-size:clamp(15px,4.9vw,20px);white-space:nowrap;letter-spacing:-.01em}
 .tile small{font-weight:400;font-size:15px;color:var(--muted)}
 .tile:active,.tile:focus-visible{border-color:var(--sage);outline:none;background:var(--sage-soft)}
+.tile.shop{min-height:120px;background:var(--orange-soft);border-color:#f1c9ab}
+.tile.shop .t{white-space:normal;font-size:clamp(17px,5.2vw,22px);line-height:1.35}
+.tile .soon{display:inline-block;margin-top:2px;padding:1px 10px;border-radius:999px;background:#fff;color:#8a4b1f;font-size:14px;font-weight:700}
+.more{margin:-8px 0 24px}
+.more-title{margin:0 0 8px;font-size:16px;font-weight:700;color:var(--muted)}
+.more a{display:inline-flex;align-items:center;min-height:52px;margin:0 8px 8px 0;padding:8px 16px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--ink);text-decoration:none;font-size:17px;font-weight:700}
 .tile.wide{grid-column:1/-1;min-height:84px;background:var(--orange-soft);border-color:#f1c9ab}
 section{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 18px;margin:0 0 18px;scroll-margin-top:12px}
 section h2{margin:0 0 6px;font-size:23px;line-height:1.5;color:var(--green)}
@@ -58,13 +64,16 @@ footer{text-align:center;font-size:14px;color:var(--muted);padding:10px 16px 30p
 </header>
 <main>
 <nav class="tiles" aria-label="メニュー">
+<a class="tile shop" href="#shopping" aria-describedby="shop-status"><span class="ic" aria-hidden="true">🛒</span><b class="t">Amazonで<br>お買い物</b><small class="soon">準備中</small></a>
+<a class="tile shop" href="#shopping" aria-describedby="shop-status"><span class="ic" aria-hidden="true">🛍️</span><b class="t">楽天市場で<br>お買い物</b><small class="soon">準備中</small></a>
 <a class="tile" href="#hints"><span class="ic" aria-hidden="true">📖</span><b class="t">暮らしのヒント</b><small>記事を探す</small></a>
 <a class="tile" href="#souji"><span class="ic" aria-hidden="true">🧹</span><b class="t">掃除・片付け</b><small>手順と注意点</small></a>
-<a class="tile" href="#sumai"><span class="ic" aria-hidden="true">🏠</span><b class="t">住まい・防災</b><small>転倒・地震・害虫</small></a>
 <a class="tile" href="#check"><span class="ic" aria-hidden="true">✅</span><b class="t">便利な確認表</b><small>依頼前の確認</small></a>
-<a class="tile" href="#shopping"><span class="ic" aria-hidden="true">🛒</span><b class="t">お買い物ガイド</b><small>選ぶときのコツ</small></a>
 <a class="tile" href="#magomart"><span class="ic" aria-hidden="true">🚚</span><b class="t">まごマート</b><small>移動式コンビニ</small></a>
-<a class="tile wide" href="#news"><span class="ic" aria-hidden="true">🔔</span><b class="t">お知らせ</b><small>新しく確認した記事</small></a>
+</nav>
+<nav class="more" aria-label="その他の情報">
+<p class="more-title">その他の情報</p>
+<a href="#sumai">🏠 住まい・防災</a><a href="#news">🔔 お知らせ</a><a href="#install">📱 ホーム画面に追加</a>
 </nav>
 
 <section id="hints" aria-labelledby="h-hints">
@@ -108,16 +117,14 @@ footer{text-align:center;font-size:14px;color:var(--muted);padding:10px 16px 30p
 </section>
 
 <section id="shopping" aria-labelledby="h-shopping">
-<h2 id="h-shopping">🛒 お買い物ガイド</h2>
-<p>道具や用品を選ぶときは、次の点を確かめると失敗が減ります。</p>
+<h2 id="h-shopping">🛒 お買い物（Amazon・楽天市場）</h2>
+<p id="shop-status"><strong>アプリ版からのお買い物は準備中です。</strong>提携先（Amazonアソシエイト・A8.net）のアプリでの利用条件を確認しています。確認ができしだい、このボタンからお買い物できるようにします。</p>
+<p>用品を選ぶときは、次の点を確かめると失敗が減ります。</p>
 <ul>
 <li>使う場所の素材や大きさに合うか（床・壁・家具など）</li>
 <li>使用上の注意（換気・混ぜてはいけない洗剤など）</li>
 <li>価格・送料・在庫は、購入前に販売ページで確認する</li>
 </ul>
-<p>暮らしの用品を探せる「お買い物コーナー」は、くらしの手帖のサイトにあります。</p>
-<a class="btn orange" href="../index.html#categories" target="_blank" rel="noopener">お買い物コーナーを開く</a>
-<p class="note">※ブラウザで開きます。お買い物コーナーには広告（PR）が含まれます。このアプリ版の画面には広告リンクを置いていません。</p>
 <a class="back" href="#" onclick="scrollTo(0,0);return false;">↑ メニューに戻る</a>
 </section>
 
