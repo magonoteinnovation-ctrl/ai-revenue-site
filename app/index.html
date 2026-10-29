@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>くらしの手帖 アプリ版｜大きな文字で暮らしのヒントを探す</title>
+<meta name="description" content="くらしの手帖のアプリ版です。掃除・片付け、住まい・防災、便利な確認表、まごマートの案内を大きな文字とボタンで探せます。スマートフォンのホーム画面に追加して使えます。">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://magonoteinnovation-ctrl.github.io/ai-revenue-site/app/">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#3f5f50">
+<link rel="icon" href="icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="くらしの手帖">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+:root{--beige:#faf6ec;--card:#ffffff;--green:#3f5f50;--sage:#6f8f7a;--sage-soft:#e6eee7;--orange:#e98a4b;--orange-soft:#fbe7d8;--ink:#23332c;--muted:#5d6b64;--line:#dfe6dc}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--beige);color:var(--ink);font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;font-size:19px;line-height:1.8;padding-bottom:env(safe-area-inset-bottom)}
+a{color:var(--green)}
+header{background:var(--green);color:#fff;padding:calc(18px + env(safe-area-inset-top)) 18px 20px}
+header h1{margin:0;font-size:26px;line-height:1.4}
+header p{margin:6px 0 0;font-size:17px;opacity:.95}
+main{max-width:720px;margin:0 auto;padding:18px 16px 40px}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:4px 0 26px}
+.tile{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;min-height:104px;padding:16px 14px;border-radius:18px;background:var(--card);border:2px solid var(--line);color:var(--ink);text-decoration:none;font-weight:800;font-size:20px;line-height:1.4;box-shadow:0 3px 10px #3f5f5012}
+.tile span.ic{font-size:30px;line-height:1}
+.tile .t{font-size:clamp(15px,4.9vw,20px);white-space:nowrap;letter-spacing:-.01em}
+.tile small{font-weight:400;font-size:15px;color:var(--muted)}
+.tile:active,.tile:focus-visible{border-color:var(--sage);outline:none;background:var(--sage-soft)}
+.tile.wide{grid-column:1/-1;min-height:84px;background:var(--orange-soft);border-color:#f1c9ab}
+section{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 18px;margin:0 0 18px;scroll-margin-top:12px}
+section h2{margin:0 0 6px;font-size:23px;line-height:1.5;color:var(--green)}
+section > p{margin:6px 0 12px}
+ul.links{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:10px}
+ul.links a{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;padding:12px 16px;border-radius:14px;background:var(--beige);border:1px solid var(--line);color:var(--ink);text-decoration:none;font-weight:700;font-size:18px;line-height:1.5}
+ul.links a::after{content:"›";font-size:26px;color:var(--sage);flex:0 0 auto}
+ul.links a>span{display:block;min-width:0}
+ul.links small{display:block;font-weight:400;font-size:14px;color:var(--muted)}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:62px;margin-top:12px;padding:12px 18px;border-radius:14px;background:var(--green);color:#fff;font-weight:800;font-size:19px;text-decoration:none;text-align:center;line-height:1.5}
+.btn.orange{background:var(--orange);color:#2b1a0e}
+.note{font-size:15px;color:var(--muted);margin:10px 0 0}
+.back{display:inline-block;margin-top:12px;font-size:16px}
+ol.steps{margin:8px 0 0;padding-left:1.4em}
+ol.steps li{margin:6px 0}
+footer{text-align:center;font-size:14px;color:var(--muted);padding:10px 16px 30px}
+@media(min-width:640px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:360px){body{font-size:18px}.tile{padding:14px 12px}}
+</style>
+</head>
+<body>
+<header>
+<h1>くらしの手帖</h1>
+<p>暮らしの困った、ここで探せます。</p>
+</header>
+<main>
+<nav class="tiles" aria-label="メニュー">
+<a class="tile" href="#hints"><span class="ic" aria-hidden="true">📖</span><b class="t">暮らしのヒント</b><small>記事を探す</small></a>
+<a class="tile" href="#souji"><span class="ic" aria-hidden="true">🧹</span><b class="t">掃除・片付け</b><small>手順と注意点</small></a>
+<a class="tile" href="#sumai"><span class="ic" aria-hidden="true">🏠</span><b class="t">住まい・防災</b><small>転倒・地震・害虫</small></a>
+<a class="tile" href="#check"><span class="ic" aria-hidden="true">✅</span><b class="t">便利な確認表</b><small>依頼前の確認</small></a>
+<a class="tile" href="#shopping"><span class="ic" aria-hidden="true">🛒</span><b class="t">お買い物ガイド</b><small>選ぶときのコツ</small></a>
+<a class="tile" href="#magomart"><span class="ic" aria-hidden="true">🚚</span><b class="t">まごマート</b><small>移動式コンビニ</small></a>
+<a class="tile wide" href="#news"><span class="ic" aria-hidden="true">🔔</span><b class="t">お知らせ</b><small>新しく確認した記事</small></a>
+</nav>
+
+<section id="hints" aria-labelledby="h-hints">
+<h2 id="h-hints">📖 暮らしのヒント</h2>
+<p>片付け・掃除・住まいの困りごとを、公的資料をもとにまとめた記事です。</p>
+<ul class="links" id="list-hints">
+<li><a href="../article-list.html" target="_blank" rel="noopener"><span>記事一覧をすべて見る</span></a></li>
+</ul>
+<a class="back" href="#" onclick="scrollTo(0,0);return false;">↑ メニューに戻る</a>
+</section>
+
+<section id="souji" aria-labelledby="h-souji">
+<h2 id="h-souji">🧹 掃除・片付け</h2>
+<p>作業の前に確認したいことと、安全のための注意点です。</p>
+<ul class="links" id="list-souji">
+<li><a href="../unwanted-items-guide.html" target="_blank" rel="noopener"><span>不用品の処分・買取で迷ったときの確認表</span></a></li>
+<li><a href="../article-list.html#cat-souji" target="_blank" rel="noopener"><span>掃除・お手入れの記事を見る</span></a></li>
+<li><a href="../article-list.html#cat-katazuke" target="_blank" rel="noopener"><span>片付け・整理の記事を見る</span></a></li>
+</ul>
+<a class="back" href="#" onclick="scrollTo(0,0);return false;">↑ メニューに戻る</a>
+</section>
+
+<section id="sumai" aria-labelledby="h-sumai">
+<h2 id="h-sumai">🏠 住まい・防災</h2>
+<p>家の中の転倒防止、地震への備え、住まいのトラブルの確認です。</p>
+<ul class="links" id="list-sumai">
+<li><a href="../articles/senior-home-safety.html" target="_blank" rel="noopener"><span>高齢の家族の転倒を防ぐ住まいの確認表<small>家具の転倒防止など地震への備えも</small></span></a></li>
+<li><a href="../pest-control-guide.html" target="_blank" rel="noopener"><span>害虫・害獣の対策と相談先</span></a></li>
+<li><a href="../article-list.html#cat-sumai" target="_blank" rel="noopener"><span>住まい・生活支援の記事を見る</span></a></li>
+</ul>
+<a class="back" href="#" onclick="scrollTo(0,0);return false;">↑ メニューに戻る</a>
+</section>
+
+<section id="check" aria-labelledby="h-check">
+<h2 id="h-check">✅ 便利な確認表</h2>
+<p>業者に頼む前や、作業の前に使えるチェックリストです。</p>
+<ul class="links" id="list-check">
+<li><a href="../request-memo.html" target="_blank" rel="noopener"><span>作業依頼メモを作る<small>無料・入力内容は送信されません</small></span></a></li>
+</ul>
+<a class="back" href="#" onclick="scrollTo(0,0);return false;">↑ メニューに戻る</a>
+</section>
+
+<section id="shopping" aria-labelledby="h-shopping">
+<h2 id="h-shopping">🛒 お買い物ガイド</h2>
+<p>道具や用品を選ぶときは、次の点を確かめると失敗が減ります。</p>
+<ul>
+<li>使う場所の素材や大きさに合うか（床・壁・家具など）</li>
+<li>使用上の注意（換気・混ぜてはいけない洗剤など）</li>
+<li>価格・送料・在庫は、購入前に販売ページで確認する</li>
+</ul>
+<p>暮らしの用品を探せる「お買い物コーナー」は、くらしの手帖のサイトにあります。</p>
+<a class="btn orange" href="../index.html#categories" target="_blank" rel="noopener">お買い物コーナーを開く</a>
+<p class="note">※ブラウザで開きます。お買い物コーナーには広告（PR）が含まれます。このアプリ版の画面には広告リンクを置いていません。</p>
+<a class="back" href="#" onclick="scrollTo(0,0);return false;">↑ メニューに戻る</a>
+</section>
+
+<section id="magomart" aria-labelledby="h-magomart">
+<h2 id="h-magomart">🚚 まごマート</h2>
+<p>株式会社まごの手INNOVATIONが運営する、移動式コンビニです。施設の一角などに小さなお店を開き、お菓子・飲み物・日用品を並べて、見て選ぶお買い物をお届けしています。</p>
+<ul>
+<li>買い物支援と、地域の見守り</li>
+<li>準備・販売・片付けまでスタッフが対応</li>
+<li>施設・地域への出店のご相談を受け付けています</li>
+</ul>
+<p>出店の様子やお知らせは、公式サイトでご覧いただけます。</p>
+<a class="btn" href="https://magonote-innovation.wixsite.com/benriya" target="_blank" rel="noopener">まごマート・公式サイトを見る</a>
+<a class="back" href="#" onclick="scrollTo(0,0);return false;">↑ メニューに戻る</a>
+</section>
+
+<section id="news" aria-labelledby="h-news">
+<h2 id="h-news">🔔 お知らせ</h2>
+<p>新しく確認・更新した記事です。</p>
+<ul class="links" id="list-news">
+<li><a href="../article-list.html" target="_blank" rel="noopener"><span>記事一覧を見る</span></a></li>
+</ul>
+<a class="back" href="#" onclick="scrollTo(0,0);return false;">↑ メニューに戻る</a>
+</section>
+
+<section id="install" aria-labelledby="h-install">
+<h2 id="h-install">📱 ホーム画面に追加する</h2>
+<p><strong>iPhone（Safari）</strong></p>
+<ol class="steps"><li>画面下の共有ボタン（□に↑）を押す</li><li>「ホーム画面に追加」を選ぶ</li><li>右上の「追加」を押す</li></ol>
+<p><strong>Android（Chrome）</strong></p>
+<ol class="steps"><li>右上の︙（メニュー）を押す</li><li>「ホーム画面に追加」または「アプリをインストール」を選ぶ</li><li>「追加」または「インストール」を押す</li></ol>
+<p class="note">追加しても料金はかかりません。記事を開くとブラウザで表示されます。</p>
+</section>
+</main>
+<footer>
+<p>運営：株式会社まごの手INNOVATION<br><a href="../privacy.html" target="_blank" rel="noopener">プライバシーと広告について</a>／<a href="../contact.html" target="_blank" rel="noopener">お問い合わせ</a></p>
+</footer>
+<script>
+(function(){
+  // 記事一覧（articles.json）から、カテゴリごとの記事とお知らせを表示する
+  function item(a){
+    var li=document.createElement('li'),link=document.createElement('a'),box=document.createElement('span');
+    link.href='../'+a.path; link.target='_blank'; link.rel='noopener';
+    box.appendChild(document.createTextNode(a.title));
+    if(a.checked_at){var s=document.createElement('small');s.textContent='確認日：'+a.checked_at;box.appendChild(s);}
+    link.appendChild(box);
+    li.appendChild(link); return li;
+  }
+  function addTo(id,list,before){
+    var ul=document.getElementById(id); if(!ul) return;
+    var ref=before?ul.firstChild:null;
+    list.forEach(function(a){ul.insertBefore(item(a),ref);});
+  }
+  fetch('../articles.json',{cache:'no-cache'}).then(function(r){return r.ok?r.json():[];}).then(function(all){
+    if(!Array.isArray(all)) return;
+    var ok=all.filter(function(a){return a&&typeof a.path==='string'&&/^articles\/[a-z0-9-]+\.html$/.test(a.path)&&a.title;});
+    var by=function(names){return ok.filter(function(a){return names.indexOf(a.category)>=0;});};
+    addTo('list-souji',by(['掃除・お手入れ','片付け・整理']),true);
+    addTo('list-sumai',by(['住まい・生活支援']).filter(function(a){return a.path!=='articles/senior-home-safety.html';}),false);
+    addTo('list-check',ok.filter(function(a){return /確認/.test(a.title);}).slice(0,6),false);
+    var news=ok.slice().sort(function(a,b){return (b.checked_at||'').localeCompare(a.checked_at||'');}).slice(0,5);
+    addTo('list-news',news,true);
+    addTo('list-hints',by(['片付け・整理','掃除・お手入れ','住まい・生活支援']).slice(0,4),true);
+  }).catch(function(){});
+})();
+</script>
+</body>
+</html>
