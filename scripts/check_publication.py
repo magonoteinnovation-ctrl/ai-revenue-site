@@ -31,7 +31,8 @@ APPROVED_A8 = {'4BEPPP+7WL8PM+4X26+TRVYQ',
                '4BEPPP+7WL8PM+4X26+TSJ41',  # FireWorks 300x250
                '4BERA4+2WSC0Q+4JGQ+BYDTT',  # マネーフォワード クラウド確定申告 300x250
                '4BERA4+34IYVU+2PEO+64C3L',  # ココナラ 300x250
-               '45K6H2+8JT5AY+348+6EMGX'}  # ロリポップ！ 336x280
+               '45K6H2+8JT5AY+348+6EMGX',  # ロリポップ！ 336x280
+               '3HC21T+C6SIE2+2HOM+BWGDT'}  # 楽天市場 商品リンク（A8楽天ツール・掲載サイト＝くらしの手帖、2026-10-29）
 
 
 def seo_errors(name, text):
@@ -53,7 +54,7 @@ def seo_errors(name, text):
             json.loads(block)
         except ValueError:
             errors.append(f'{name}: 構造化データのJSONが壊れています')
-    for tag in re.findall(r'<a\b[^>]*href="https?://px\.a8\.net/[^"]*"[^>]*>', text):
+    for tag in re.findall(r'<a\b[^>]*href="https?://r?px\.a8\.net/[^"]*"[^>]*>', text):
         if 'sponsored' not in tag:
             errors.append(f'{name}: A8.netの広告リンクに rel="sponsored" がありません')
         mat = re.search(r'a8mat=([^"&]+)', tag)
