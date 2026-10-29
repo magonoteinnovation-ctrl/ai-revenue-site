@@ -201,7 +201,7 @@ def build(root=ROOT):
     e = html.escape
     list_page = '''<!doctype html><html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="くらしの手帖の公開記事一覧。掃除や住まいの困りごとを公式資料とともに紹介します。">
+<meta name="description" content="片付け・不用品処分、掃除、引越し、住まいのトラブルを解決するための確認表・記事一覧。公的資料と便利屋の現場目線をもとに、依頼前に知りたいポイントを整理。">
 <title>記事一覧｜くらしの手帖</title><style>
 body{margin:0;background:#faf8f2;color:#1b2d29;font-family:Meiryo,sans-serif;line-height:1.9}
 header,footer{padding:24px;background:#173b32;color:#fff}header a,footer a{color:#fff}
@@ -209,7 +209,7 @@ main{max-width:900px;padding:40px 22px 70px;margin:auto}h1{font-size:34px}
 .article{background:white;border:1px solid #dce5db;border-radius:16px;padding:24px;margin:20px 0}
 .article h3{font-size:22px;line-height:1.6}h2{margin-top:40px;font-size:26px}.cats{display:flex;flex-wrap:wrap;gap:20px 22px;margin:18px 0}.cats a{font-weight:700}.article p{color:#53685e}a{color:#276a4c}.tag{font-size:13px;color:#276a4c}
 </style></head><body><header><a href="index.html">くらしの手帖｜トップへ戻る</a></header>
-<main><h1>暮らしに役立つ記事一覧</h1><p>公式資料をもとにした記事には、出典と資料の確認日を掲載しています。</p>'''
+<main><h1>片付け・掃除・住まいの困りごとを解決する記事一覧</h1><p>不用品処分、遺品整理、ハウスクリーニング、引越し、住まいのトラブルなど、依頼前に確認したいことをテーマ別にまとめました。公式資料を参照した記事には、出典と資料の確認日を掲載しています。</p><p>作業を依頼する前に条件を整理したい方は、<a href="request-memo.html">無料の作業依頼メモ作成ツール</a>もご活用ください。</p>'''
     entries = catalog(root, items)
     list_page += '<nav class="cats" aria-label="カテゴリー">' + ''.join(
         f'<a href="#cat-{key}">{e(name)}</a>' for key, name in CATEGORIES
