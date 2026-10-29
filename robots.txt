@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://magonoteinnovation-ctrl.github.io/ai-revenue-site/sitemap.xml
+Sitemap: https://magonoteinnovation-ctrl.github.io/ai-revenue-site/sitemap.txt
