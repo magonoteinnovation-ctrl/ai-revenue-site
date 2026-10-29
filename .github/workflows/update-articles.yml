@@ -10,6 +10,7 @@ on:
       - 'robots.txt'
       - 'articles.json'
       - 'articles/**'
+      - 'app/**'
       - 'scripts/**'
       - '.github/workflows/update-articles.yml'
   schedule:
@@ -86,6 +87,8 @@ jobs:
           # 検索エンジン向けの robots.txt も公開する（サイトマップの場所を伝える）
           if [ -f robots.txt ]; then cp robots.txt _site/; fi
           if [ -d articles ]; then cp -R articles _site/; fi
+          # スマホ向けアプリ版（PWA）：静的ファイルをそのまま公開する
+          if [ -d app ]; then cp -R app _site/; fi
           test -f _site/index.html && test -f _site/readability.css
       - uses: actions/upload-pages-artifact@v3
         with:
