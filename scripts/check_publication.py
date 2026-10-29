@@ -100,6 +100,13 @@ def check(root=ROOT):
             errors.append('index.html: 楽天市場トップ（A8）の導線がないか、計測コード・PR表記が欠けています')
         elif top.find('id="categories"') > top.find('<!-- 楽天市場トップ（A8）開始 -->'):
             errors.append('index.html: 楽天市場トップ（A8）の導線が「気になるテーマを選ぶ」より上にあります')
+        # Amazonアソシエイトの導線（正規の特別リンク・トラッキングID・開示文言・PR表記）が残っているか確認する
+        amz = re.search(r'<!-- Amazonトップ（アソシエイト）開始 -->(.*?)<!-- Amazonトップ（アソシエイト）終了 -->', top, flags=re.S)
+        if not amz or 'tag=magonoteinnov-22' not in amz.group(1) or 'sponsored' not in amz.group(1) \
+                or '適格販売により収入を得ています' not in amz.group(1) or 'PR' not in amz.group(1):
+            errors.append('index.html: Amazonアソシエイトの導線がないか、トラッキングID・開示文言・PR表記が欠けています')
+        elif top.find('id="categories"') > top.find('<!-- Amazonトップ（アソシエイト）開始 -->'):
+            errors.append('index.html: Amazonの導線が「気になるテーマを選ぶ」より上にあります')
     for file in pages:
         errors.extend(seo_errors(str(file.relative_to(root)), file.read_text(encoding='utf-8')))
     if errors:
