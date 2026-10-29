@@ -59,7 +59,7 @@ jobs:
       - name: 検証済みの記事を保存
         run: |
           # 新しいページやCSS・画像を追加しても保存漏れがないよう、公開対象をまとめて指定する
-          git add -A -- articles.json automation-state.json sitemap.xml ':(glob)*.html' ':(glob)*.css' ':(glob)*.png'
+          git add -A -- articles.json automation-state.json sitemap.xml sitemap.txt ':(glob)*.html' ':(glob)*.css' ':(glob)*.png'
           if [ -d articles ]; then git add -A -- articles; fi
           if git diff --cached --quiet; then exit 0; fi
           git config user.name "github-actions[bot]"
@@ -81,7 +81,7 @@ jobs:
         run: |
           mkdir -p _site
           # 公開対象：トップ直下のHTML・CSS・画像・一覧データと articles/ 以下（Markdownや scripts は公開しない）
-          cp ./*.html ./*.css articles.json sitemap.xml _site/
+          cp ./*.html ./*.css articles.json sitemap.xml sitemap.txt _site/
           for f in ./*.png; do [ -e "$f" ] && cp "$f" _site/; done
           # 検索エンジン向けの robots.txt も公開する（サイトマップの場所を伝える）
           if [ -f robots.txt ]; then cp robots.txt _site/; fi
