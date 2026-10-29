@@ -91,6 +91,15 @@ def check(root=ROOT):
                 errors.append(f'{file.relative_to(root)}: リンク先がありません {ref}')
             elif url.fragment and target in pages and unquote(url.fragment) not in pages[target].ids:
                 errors.append(f'{file.relative_to(root)}: ページ内の移動先がありません {ref}')
+    index_file = root / 'index.html'
+    if root == ROOT.resolve() and index_file.is_file():
+        # トップの「気になるテーマを選ぶ」直下の楽天市場（A8）導線が、自動更新などで消えていないか確認する
+        top = index_file.read_text(encoding='utf-8')
+        cta = re.search(r'<!-- 楽天市場トップ（A8）開始 -->(.*?)<!-- 楽天市場トップ（A8）終了 -->', top, flags=re.S)
+        if not cta or 'a8mat=3HC21T+C6SIE2+2HOM+BW8O1' not in cta.group(1) or 'PR' not in cta.group(1):
+            errors.append('index.html: 楽天市場トップ（A8）の導線がないか、計測コード・PR表記が欠けています')
+        elif top.find('id="categories"') > top.find('<!-- 楽天市場トップ（A8）開始 -->'):
+            errors.append('index.html: 楽天市場トップ（A8）の導線が「気になるテーマを選ぶ」より上にあります')
     for file in pages:
         errors.extend(seo_errors(str(file.relative_to(root)), file.read_text(encoding='utf-8')))
     if errors:
