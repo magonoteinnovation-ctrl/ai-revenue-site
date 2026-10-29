@@ -250,6 +250,9 @@ main{max-width:900px;padding:40px 22px 70px;margin:auto}h1{font-size:34px}
         if path in dated:
             ET.SubElement(entry, '{' + NS + '}lastmod').text = dated[path]
     ET.ElementTree(sitemap).write(root / 'sitemap.xml', encoding='utf-8', xml_declaration=True)
+    # 予備のテキスト形式サイトマップ（1行1URL、UTF-8）。sitemap.xml と同じURL一覧から作る
+    (root / 'sitemap.txt').write_text(
+        ''.join(BASE + path + '\n' for path in ['', 'article-list.html'] + paths), encoding='utf-8')
     print(f'記事一覧とサイトマップを更新しました（{len(paths) + 2}ページ）。')
 
 

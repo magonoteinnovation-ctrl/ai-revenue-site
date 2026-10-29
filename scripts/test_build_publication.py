@@ -29,6 +29,8 @@ class PublicationTests(unittest.TestCase):
             self.assertEqual(len(locs), len(set(locs)))
             self.assertIn(BASE + 'articles/example.html', locs)
             self.assertNotIn(BASE + 'index.html', locs)
+            # テキスト形式のサイトマップは sitemap.xml と同じURLを同じ順番で持つ
+            self.assertEqual((root / 'sitemap.txt').read_text().splitlines(), locs)
 
     def test_invalid_path_and_missing_file_abort(self):
         for path in ('../secret.html', 'articles/not-found.html'):
@@ -38,6 +40,7 @@ class PublicationTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     build(root)
                 self.assertFalse((root / 'sitemap.xml').exists())
+                self.assertFalse((root / 'sitemap.txt').exists())
 
 
     def test_seo_meta_is_regenerated_once(self):
