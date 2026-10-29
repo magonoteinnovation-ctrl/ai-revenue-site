@@ -11,8 +11,9 @@ OFFICIAL_URL = 'https://magonote-innovation.wixsite.com/benriya'
 # 運営会社の公式SNS（Wix公式サイトに掲載されているアカウント）
 SNS_LINKS = [('Instagram', 'https://www.instagram.com/magonoteinnovation/'), ('X（旧Twitter）', 'https://x.com/benriyamagonote')]
 GUIDE_PATHS = ('pest-control-guide.html', 'unwanted-items-guide.html')
-# カテゴリー（トップの「お悩みから探す」と同じ3分類）。記事一覧の見出しと関連記事に使う。
-CATEGORIES = [('katazuke', '片付け・整理'), ('souji', '掃除・お手入れ'), ('sumai', '住まい・生活支援')]
+# カテゴリー（トップの「お悩みから探す」の3分類＋仕事・副業の効率化）。記事一覧の見出しと関連記事に使う。
+CATEGORIES = [('katazuke', '片付け・整理'), ('souji', '掃除・お手入れ'), ('sumai', '住まい・生活支援'),
+              ('shigoto', '仕事・副業の効率化')]
 CATEGORY_NAMES = [name for _, name in CATEGORIES]
 DEFAULT_CATEGORY = '住まい・生活支援'
 # 手書きのガイド（トップ直下のページ）。存在するものだけを一覧・関連記事・サイトマップに載せる。

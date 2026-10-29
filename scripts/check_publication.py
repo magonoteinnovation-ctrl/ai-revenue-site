@@ -23,7 +23,10 @@ class Page(HTMLParser):
             self.refs.append(attrs[key])
 
 # 掲載を承認済みのA8.net広告（a8mat の値）。新しい案件は提携承認を確認してからここに追加する。
-APPROVED_A8 = {'4BEPPP+7WL8PM+4X26+TRVYQ'}
+APPROVED_A8 = {'4BEPPP+7WL8PM+4X26+TRVYQ',
+               '4BERA4+2WSC0Q+4JGQ+BX3J6',  # マネーフォワード クラウド確定申告（2026-10-29提携）
+               '45K6H2+8JT5AY+348+64Z8Y',  # ロリポップ！（くらしの手帖掲載用）
+               '4BERA4+34IYVU+2PEO+6C1VM'}  # ココナラ出品者募集（2026-10-29提携）
 
 
 def seo_errors(name, text):
