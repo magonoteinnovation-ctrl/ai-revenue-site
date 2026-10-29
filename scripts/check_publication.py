@@ -148,6 +148,25 @@ def check(root=ROOT):
         elif top.find('id="categories"') > top.find('<!-- Amazonトップ（アソシエイト）開始 -->'):
             errors.append('index.html: Amazonの導線が「気になるテーマを選ぶ」より上にあります')
     errors.extend(app_errors(root))
+    # ひみつの数字検索で開くページ：サイト内に通常リンクがないため A8（楽天を含む）の広告は置かない。
+    # 遊技・競馬の案内ページには広告・投票サービスへのリンクを置かない。
+    for name in ('secret-wacchi.html', 'secret-slot.html', 'secret-pachinko.html', 'secret-keiba.html'):
+        f = root / name
+        if not f.is_file():
+            continue
+        t = f.read_text(encoding='utf-8')
+        if re.search(r'a8\.net|rakuten', t):
+            errors.append(f'{name}: ひみつのページにA8.net・楽天のリンクがあります（サイト内リンクのないページには掲載できません）')
+        if 'noindex' not in t:
+            errors.append(f'{name}: ひみつのページに noindex がありません')
+        if name != 'secret-wacchi.html' and re.search(r'amazon\.co\.jp|amzn\.|tag=|ipat|即PAT', t):
+            errors.append(f'{name}: 遊技・競馬の案内ページに広告・投票サービスへのリンクがあります')
+        if name == 'secret-wacchi.html':
+            for tag in re.findall(r'<a\b[^>]*amazon\.co\.jp[^>]*>', t):
+                if 'sponsored' not in tag or 'tag=magonoteinnov-22' not in tag:
+                    errors.append(f'{name}: Amazonリンクに sponsored または正規のトラッキングIDがありません')
+            if 'amazon.co.jp' in t and '適格販売により収入を得ています' not in t:
+                errors.append(f'{name}: Amazonの開示文がありません')
     for file in pages:
         errors.extend(seo_errors(str(file.relative_to(root)), file.read_text(encoding='utf-8')))
     if errors:
