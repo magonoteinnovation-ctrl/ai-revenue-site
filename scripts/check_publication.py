@@ -148,6 +148,14 @@ def check(root=ROOT):
         elif top.find('id="categories"') > top.find('<!-- Amazonトップ（アソシエイト）開始 -->'):
             errors.append('index.html: Amazonの導線が「気になるテーマを選ぶ」より上にあります')
     errors.extend(app_errors(root))
+    # Amazonアソシエイト規約（運営規約(g)・審査「紹介料の使用目的が寄付・支援」）対策：
+    # 商品購入と地域支援・まごマートを結び付ける表現を公開ページに入れない
+    support_pat = re.compile(r'(紹介料|広告収益|報酬)[^。]{0,40}(地域|まごマート|出店|寄付|支援|還元)'
+                             r'|お買い物[^。]{0,20}(地域を救|地域の応援|地域の支え|地域支援|応援につなが|支援につなが)'
+                             r'|出店費用に還元')
+    for file in sorted(root.glob('*.html')) + sorted((root / 'articles').glob('*.html')) + sorted((root / 'app').glob('*.html')):
+        if support_pat.search(file.read_text(encoding='utf-8')):
+            errors.append(f'{file.relative_to(root)}: 商品購入と地域支援を結び付ける表現があります（Amazonアソシエイト規約）')
     # ひみつの数字検索で開くページ：サイト内に通常リンクがないため A8（楽天を含む）の広告は置かない。
     # 遊技・競馬の案内ページには広告・投票サービスへのリンクを置かない。
     for name in ('secret-wacchi.html', 'secret-slot.html', 'secret-pachinko.html', 'secret-keiba.html'):
