@@ -32,7 +32,8 @@ APPROVED_A8 = {'4BEPPP+7WL8PM+4X26+TRVYQ',
                '4BERA4+2WSC0Q+4JGQ+BYDTT',  # マネーフォワード クラウド確定申告 300x250
                '4BERA4+34IYVU+2PEO+64C3L',  # ココナラ 300x250
                '45K6H2+8JT5AY+348+6EMGX',  # ロリポップ！ 336x280
-               '3HC21T+C6SIE2+2HOM+BWGDT'}  # 楽天市場 商品リンク（A8楽天ツール・掲載サイト＝くらしの手帖、2026-10-29）
+               '3HC21T+C6SIE2+2HOM+BWGDT',  # 楽天市場 商品リンク（A8楽天ツール・掲載サイト＝くらしの手帖、2026-10-29）
+               '3HC21T+C6SIE2+2HOM+6B70I'}  # 楽天市場トップ テキスト素材「楽天市場」（A8楽天ツール→広告リンク、くらしの手帖、2026-10-29）
 
 
 def seo_errors(name, text):
