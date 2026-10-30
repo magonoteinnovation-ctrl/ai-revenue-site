@@ -158,7 +158,7 @@ def check(root=ROOT):
             errors.append(f'{file.relative_to(root)}: 商品購入と地域支援を結び付ける表現があります（Amazonアソシエイト規約）')
     # ひみつの数字検索で開くページ：サイト内に通常リンクがないため A8（楽天を含む）の広告は置かない。
     # 遊技・競馬の案内ページには広告・投票サービスへのリンクを置かない。
-    for name in ('secret-wacchi.html', 'secret-slot.html', 'secret-pachinko.html', 'secret-keiba.html'):
+    for name in ('secret-wacchi.html', 'secret-isono.html', 'secret-slot.html', 'secret-pachinko.html', 'secret-keiba.html'):
         f = root / name
         if not f.is_file():
             continue
@@ -167,9 +167,9 @@ def check(root=ROOT):
             errors.append(f'{name}: ひみつのページにA8.net・楽天のリンクがあります（サイト内リンクのないページには掲載できません）')
         if 'noindex' not in t:
             errors.append(f'{name}: ひみつのページに noindex がありません')
-        if name != 'secret-wacchi.html' and re.search(r'amazon\.co\.jp|amzn\.|tag=|ipat|即PAT', t):
+        if name not in ('secret-wacchi.html', 'secret-isono.html') and re.search(r'amazon\.co\.jp|amzn\.|tag=|ipat|即PAT', t):
             errors.append(f'{name}: 遊技・競馬の案内ページに広告・投票サービスへのリンクがあります')
-        if name == 'secret-wacchi.html':
+        if name in ('secret-wacchi.html', 'secret-isono.html'):
             for tag in re.findall(r'<a\b[^>]*amazon\.co\.jp[^>]*>', t):
                 if 'sponsored' not in tag or 'tag=magonoteinnov-22' not in tag:
                     errors.append(f'{name}: Amazonリンクに sponsored または正規のトラッキングIDがありません')
