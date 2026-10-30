@@ -6,7 +6,7 @@
   "lang": "ja",
   "start_url": "/ai-revenue-site/",
   "scope": "/ai-revenue-site/",
-  "display": "standalone",
+  "display": "browser",
   "background_color": "#faf8f2",
   "theme_color": "#173b32",
   "icons": [
