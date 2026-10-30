@@ -175,6 +175,36 @@ def check(root=ROOT):
                     errors.append(f'{name}: Amazonリンクに sponsored または正規のトラッキングIDがありません')
             if 'amazon.co.jp' in t and '適格販売により収入を得ています' not in t:
                 errors.append(f'{name}: Amazonの開示文がありません')
+    # Android Chromeホーム画面ショートカット（アプリ化しない）
+    mf = root / 'manifest.webmanifest'
+    if not mf.is_file():
+        errors.append('manifest.webmanifest: ファイルがありません')
+    else:
+        import json
+        try:
+            config = json.loads(mf.read_text(encoding='utf-8'))
+        except ValueError:
+            errors.append('manifest.webmanifest: JSON形式が無効です')
+            config = {}
+        if config.get('display') != 'browser':
+            errors.append('manifest.webmanifest: display は browser を維持してください')
+        if config.get('short_name') != 'くらしの手帖':
+            errors.append('manifest.webmanifest: short_name が一致しません')
+        sizes = set()
+        for icon in config.get('icons', []):
+            source = icon.get('src', '')
+            if '://' in source or not (root / source).is_file():
+                errors.append(f'manifest.webmanifest: アイコンが見つかりません: {source}')
+            else:
+                sizes.add(icon.get('sizes'))
+        if not {'192x192', '512x512'} <= sizes:
+            errors.append('manifest.webmanifest: 192と512ピクセルのアイコンが必要です')
+        home = (root / 'index.html').read_text(encoding='utf-8')
+        for element in ('rel="manifest"', 'name="application-name" content="くらしの手帖"', 'href="favicon.png"', 'href="apple-touch-icon.png"'):
+            if element not in home:
+                errors.append(f'index.html: ホーム画面用指定がありません: {element}')
+        if re.search(r'serviceWorker\\.register', home):
+            errors.append('index.html: Service Workerは追加しないでください')
     for file in pages:
         errors.extend(seo_errors(str(file.relative_to(root)), file.read_text(encoding='utf-8')))
     if errors:

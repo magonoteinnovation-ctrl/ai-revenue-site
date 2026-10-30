@@ -8,6 +8,7 @@ on:
       - 'readability.css'
       - '*.png'
       - 'robots.txt'
+      - 'manifest.webmanifest'
       - 'articles.json'
       - 'articles/**'
       - 'app/**'
@@ -86,10 +87,13 @@ jobs:
           for f in ./*.png; do [ -e "$f" ] && cp "$f" _site/; done
           # 検索エンジン向けの robots.txt も公開する（サイトマップの場所を伝える）
           if [ -f robots.txt ]; then cp robots.txt _site/; fi
+          # Webショートカット用のmanifestをGitHub Pagesにも公開する
+          if [ -f manifest.webmanifest ]; then cp manifest.webmanifest _site/; fi
           if [ -d articles ]; then cp -R articles _site/; fi
           # スマホ向けアプリ版（PWA）：静的ファイルをそのまま公開する
           if [ -d app ]; then cp -R app _site/; fi
           test -f _site/index.html && test -f _site/readability.css
+          test -f _site/manifest.webmanifest && test -f _site/icon-192.png && test -f _site/icon-512.png && test -f _site/favicon.png
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
