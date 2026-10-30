@@ -1,0 +1,20 @@
+{
+  "id": "/ai-revenue-site/",
+  "name": "くらしの手帖",
+  "short_name": "くらしの手帖",
+  "description": "便利屋の現場目線で届ける、片付け・掃除・住まいのヒント",
+  "lang": "ja",
+  "start_url": "/ai-revenue-site/",
+  "scope": "/ai-revenue-site/",
+  "display": "standalone",
+  "background_color": "#faf8f2",
+  "theme_color": "#173b32",
+  "icons": [
+    {
+      "src": "https://static.wixstatic.com/media/c2bf54_c3dd7238bc404870aae9cf0c63733e48~mv2.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
