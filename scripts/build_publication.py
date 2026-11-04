@@ -175,10 +175,13 @@ def seo_meta(text, url, kind, modified=None, image=None):
 
 
 def set_canonical(text, url):
-    # 所有権確認のみ。広告配信スクリプトは審査・同意設定後に追加する。
+    # 所有権確認と広告コードを、生成ページにも重複せず配置する。
     meta = '<meta name="google-adsense-account" content="ca-pub-8158546915072061">'
     if 'name="google-adsense-account"' not in text:
         text = text.replace('</head>', meta + '\n</head>')
+    script = '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8158546915072061" crossorigin="anonymous"></script>'
+    if 'pagead/js/adsbygoogle.js' not in text:
+        text = text.replace('</head>', script + '\n</head>', 1)
     text = re.sub(r'<link\b[^>]*\brel=["\x27]canonical["\x27][^>]*>\s*', '', text, flags=re.I)
     return text.replace('</head>', '<link rel="canonical" href="' + html.escape(url, quote=True) + '">\n</head>')
 
