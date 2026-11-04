@@ -85,7 +85,11 @@ jobs:
           mkdir -p _site
           # 公開対象：トップ直下のHTML・CSS・画像・一覧データと articles/ 以下（Markdownや scripts は公開しない）
           cp ./*.html ./*.css articles.json sitemap.xml sitemap.txt _site/
-          for f in ./*.png; do [ -e "$f" ] && cp "$f" _site/; done
+          for f in ./*.png; do
+            [ -e "$f" ] || continue
+            case "$f" in ./chlorine-mob.png|./cmp-mob.png|./who-mob.png) continue ;; esac
+            cp "$f" _site/
+          done
           # 検索エンジン向けの robots.txt も公開する（サイトマップの場所を伝える）
           if [ -f robots.txt ]; then cp robots.txt _site/; fi
           # Webショートカット用のmanifestをGitHub Pagesにも公開する
