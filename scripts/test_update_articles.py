@@ -15,6 +15,9 @@ spec.loader.exec_module(updater)
 SOURCE = '省エネの工夫を行う際は、取扱説明書を確認し、無理のない範囲で取り組むことが大切です。'
 TEXT = ('使い方を見直すときは、まず機器の取扱説明書を読み、使える機能や注意事項を確認しましょう。'
         '日々の生活で続けやすい方法を選び、無理のない範囲で取り組むことが大切です。')
+# 本番のSOURCESは空（全記事が手書き管理）のため、テスト用の資料を差し込んで動作を確認する。
+TEST_SOURCES = [{'slug': 'test-source', 'title': 'テスト用の資料', 'url': 'https://www.kokusen.go.jp/test.html',
+                 'category': '掃除・お手入れ'}]
 ARTICLE = {'title': '無理なく省エネに取り組むための確認事項', 'sections': [
     {'heading': '取扱説明書の確認', 'text': TEXT, 'evidence': SOURCE} for _ in range(3)]}
 
@@ -27,8 +30,11 @@ class UpdateTests(unittest.TestCase):
             (self.root / name).write_text(json.dumps(value))
         self.root_patch = patch.object(updater, 'ROOT', self.root)
         self.root_patch.start()
+        self.sources_patch = patch.object(updater, 'SOURCES', TEST_SOURCES)
+        self.sources_patch.start()
 
     def tearDown(self):
+        self.sources_patch.stop()
         self.root_patch.stop()
         self.temp.cleanup()
 
@@ -85,6 +91,7 @@ class UpdateTests(unittest.TestCase):
         slugs = {s['slug'] for s in updater.SOURCES}
         self.assertFalse(slugs & updater.MANUAL_ARTICLES)
         self.assertIn('house-cleaning-checklist', updater.MANUAL_ARTICLES)
+        self.assertIn('cleaning-product-safety', updater.MANUAL_ARTICLES)
 
     def test_summary_is_short_and_ends_at_sentence(self):
         long_text = '最初の文はここで終わります。' * 12

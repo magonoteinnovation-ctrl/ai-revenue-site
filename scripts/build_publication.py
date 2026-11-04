@@ -10,7 +10,7 @@ BASE = 'https://magonoteinnovation-ctrl.github.io/ai-revenue-site/'
 OFFICIAL_URL = 'https://magonote-innovation.wixsite.com/benriya'
 # 運営会社の公式SNS（Wix公式サイトに掲載されているアカウント）
 SNS_LINKS = [('Instagram', 'https://www.instagram.com/magonoteinnovation/'), ('X（旧Twitter）', 'https://x.com/benriyamagonote')]
-GUIDE_PATHS = ('pest-control-guide.html', 'unwanted-items-guide.html')
+GUIDE_PATHS = ('pest-control-guide.html', 'unwanted-items-guide.html', 'who-to-ask.html')
 # カテゴリー（トップの「お悩みから探す」の3分類＋仕事・副業の効率化）。記事一覧の見出しと関連記事に使う。
 CATEGORIES = [('katazuke', '片付け・整理'), ('souji', '掃除・お手入れ'), ('sumai', '住まい・生活支援'),
               ('shigoto', '仕事・副業の効率化')]
@@ -22,13 +22,15 @@ GUIDES = [
      'description': '買取、自治体処分、業者依頼を選ぶ前の確認事項と、許可業者の確かめ方。'},
     {'path': 'pest-control-guide.html', 'category': '住まい・生活支援', 'title': '家で害虫・害獣を見つけたら？',
      'description': '安全に確認する手順と、専門業者に相談する際の確認項目。'},
+    {'path': 'who-to-ask.html', 'category': '住まい・生活支援', 'title': 'この作業は誰に頼む？資格・許可が必要かの判断ガイド',
+     'description': 'コンセント増設、蛇口交換、不用品回収、家電の処分、ハチの巣などを、作業ごとに頼み先で整理した判断表。'},
 ]
 OG_IMAGE = 'og-image.png'
 RELATED_START, RELATED_END = '<!-- 関連記事 開始 -->', '<!-- 関連記事 終了 -->'
 START = '<!-- 自動記事一覧 開始 -->'
 END = '<!-- 自動記事一覧 終了 -->'
 NS = 'http://www.sitemaps.org/schemas/sitemap/0.9'
-SUPPORT = [('request-memo.html', '作業依頼メモ'), ('about.html', 'このサイトについて'),
+SUPPORT = [('request-memo.html', '作業依頼メモ'), ('estimate-compare.html', '見積もり比較シート'), ('about.html', 'このサイトについて'),
            ('contact.html', 'お問い合わせ'), ('privacy.html', 'プライバシーと広告')]
 
 

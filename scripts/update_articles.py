@@ -16,14 +16,13 @@ from urllib.parse import urlparse
 ROOT = Path(__file__).resolve().parents[1]
 MODEL = 'gemini-3.5-flash-lite'
 # house-cleaning-checklist は手書き管理に移行したため、自動生成の対象外（上書き防止）。
-MANUAL_ARTICLES = {'house-cleaning-checklist', 'urgent-repair-checklist', 'estate-cleanup-checklist', 'senior-home-safety',
+MANUAL_ARTICLES = {'house-cleaning-checklist', 'cleaning-product-safety', 'urgent-repair-checklist', 'estate-cleanup-checklist', 'senior-home-safety',
                    'licensed-work-checklist', 'vacant-house-care', 'moving-trouble-checklist',
                    'side-income-tax-return', 'ai-transcription-checklist', 'small-business-website-checklist',
                    'ai-image-copyright-checklist', 'skill-selling-checklist'}
-SOURCES = [
-    {'slug': 'cleaning-product-safety', 'title': '掃除用洗浄剤を使う前に確認したいこと',
-     'url': 'https://www.kokusen.go.jp/news/data/n-20260318_1.html', 'category': '掃除・お手入れ'},
-]
+# 2026-11-05：cleaning-product-safety を手書きの確認表に改稿したため、自動生成の対象はなし。
+# 新しい資料を追加する場合も、AI要約だけの薄い記事にならないよう公開前に人が内容を確認すること。
+SOURCES = []
 
 
 class Extractor(HTMLParser):
