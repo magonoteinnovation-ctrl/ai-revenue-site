@@ -22,6 +22,11 @@ class PublicationTests(unittest.TestCase):
             self.assertIn('&lt;危険&gt;', before)
             self.assertIn('href="articles/example.html"', before)
             self.assertEqual(before.count('rel="canonical"'), 1)
+            script = 'pagead/js/adsbygoogle.js?client=ca-pub-8158546915072061'
+            for name in ('index.html', 'article-list.html', 'articles/example.html'):
+                page = (root / name).read_text()
+                self.assertEqual(page.count(script), 1, name)
+                self.assertLess(page.index(script), page.index('</head>'), name)
             self.assertEqual(before.count(OFFICIAL_URL), 1)
             self.assertNotIn(BASE + 'unwanted-items-guide.html', (root / 'sitemap.xml').read_text())
             urls = ET.parse(root / 'sitemap.xml').findall('{' + NS + '}url')
