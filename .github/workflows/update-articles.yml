@@ -34,7 +34,8 @@ jobs:
       - name: 自動更新と記事一覧の検証
         run: python -m unittest discover -s scripts -p 'test_*.py'
       - name: 無料枠を確認して記事を生成
-        if: github.event_name != 'push'
+        # AdSense「有用性の低いコンテンツ」対応中は、週次のAI自動生成を止め、手動実行時のみ生成する
+        if: github.event_name == 'workflow_dispatch'
         id: generate
         # 資料サイトやAPIの一時障害で、既存記事の公開まで止めない（失敗は警告として残す）
         continue-on-error: true
