@@ -1,6 +1,6 @@
 # AI自動運営・7機能連携設計
 
-対象：くらしの手帖（GitHub Pages）／便利屋まごの手INNOVATION（既存Wixサイト）
+対象：暮らしのまごの手（GitHub Pages）／便利屋まごの手INNOVATION（既存Wixサイト）
 
 ## 現在利用できるもの
 - Connectors：ChatGPT側のGitHub、Wixなど、実際に接続済みのサービスを利用。
