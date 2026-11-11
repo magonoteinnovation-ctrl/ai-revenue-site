@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from check_publication import check, seo_errors
 
-GOOD = ('<html><head><title>記事｜くらしの手帖</title><meta name="description" content="説明">'
+GOOD = ('<html><head><title>記事｜暮らしのまごの手</title><meta name="description" content="説明">'
         '<link rel="canonical" href="https://example.com/a.html"></head><body><h1>見出し</h1>{body}</body></html>')
 
 

@@ -52,7 +52,7 @@ class PublicationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / 'articles').mkdir()
-            (root / 'articles/example.html').write_text('<html><head><title>見出し&lt;A&gt;｜くらしの手帖</title><meta name="description" content="説明"></head><body><footer>f</footer></body></html>')
+            (root / 'articles/example.html').write_text('<html><head><title>見出し&lt;A&gt;｜暮らしのまごの手</title><meta name="description" content="説明"></head><body><footer>f</footer></body></html>')
             (root / 'index.html').write_text('<html><head><title>トップ</title></head><body><div id="automaticArticles" class="articles" aria-live="polite"></div><footer><div class="footerlinks"></div></footer></body></html>')
             (root / 'articles.json').write_text(json.dumps([{'path': 'articles/example.html', 'title': 't', 'description': 'd', 'checked_at': '2026-10-26'}]))
             build(root)
@@ -83,7 +83,7 @@ class PublicationTests(unittest.TestCase):
 
     def _site(self, root):
         (root / 'articles').mkdir()
-        page = '<html><head><title>{t}｜くらしの手帖</title><meta name="description" content="説明"></head><body><main>{b}</main><footer>f</footer></body></html>'
+        page = '<html><head><title>{t}｜暮らしのまごの手</title><meta name="description" content="説明"></head><body><main>{b}</main><footer>f</footer></body></html>'
         (root / 'articles/a.html').write_text(page.format(t='記事A', b='本文'))
         (root / 'articles/b.html').write_text(page.format(t='記事B', b='本文'))
         (root / 'unwanted-items-guide.html').write_text(page.format(t='不用品', b='資料確認日：2026年10月27日'))

@@ -143,10 +143,10 @@ def seo_meta(text, url, kind, modified=None, image=None):
     e = lambda v: html.escape(v, quote=True)
     title = re.search(r'<title>(.*?)</title>', text, re.S)
     desc = re.search(r'<meta name="description" content="([^"]*)"', text)
-    title = html.unescape(title.group(1).strip()) if title else 'くらしの手帖'
+    title = html.unescape(title.group(1).strip()) if title else '暮らしのまごの手'
     desc = html.unescape(desc.group(1)) if desc else ''
     tags = [f'<meta property="og:{k}" content="{e(v)}">' for k, v in (
-        ('type', 'article' if kind == 'article' else 'website'), ('site_name', 'くらしの手帖'),
+        ('type', 'article' if kind == 'article' else 'website'), ('site_name', '暮らしのまごの手'),
         ('title', title), ('description', desc), ('url', url), ('locale', 'ja_JP'))]
     if image:
         tags.append(f'<meta property="og:image" content="{e(image)}">')
@@ -163,7 +163,7 @@ def seo_meta(text, url, kind, modified=None, image=None):
         if image:
             data['image'] = image
         crumbs = {'@type': 'BreadcrumbList', 'itemListElement': [
-            {'@type': 'ListItem', 'position': 1, 'name': 'くらしの手帖', 'item': BASE},
+            {'@type': 'ListItem', 'position': 1, 'name': '暮らしのまごの手', 'item': BASE},
             {'@type': 'ListItem', 'position': 2, 'name': '記事一覧', 'item': BASE + 'article-list.html'},
             {'@type': 'ListItem', 'position': 3, 'name': headline, 'item': url}]}
         graph = {'@context': 'https://schema.org', '@graph': [data, crumbs]}
@@ -207,13 +207,13 @@ def build(root=ROOT):
     list_page = '''<!doctype html><html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="片付け・不用品処分、掃除、引越し、住まいのトラブルを解決するための確認表・記事一覧。公的資料と便利屋の現場目線をもとに、依頼前に知りたいポイントを整理。">
-<title>記事一覧｜くらしの手帖</title><style>
+<title>記事一覧｜暮らしのまごの手</title><style>
 body{margin:0;background:#faf8f2;color:#1b2d29;font-family:Meiryo,sans-serif;line-height:1.9}
 header,footer{padding:24px;background:#173b32;color:#fff}header a,footer a{color:#fff}
 main{max-width:900px;padding:40px 22px 70px;margin:auto}h1{font-size:34px}
 .article{background:white;border:1px solid #dce5db;border-radius:16px;padding:24px;margin:20px 0}
 .article h3{font-size:22px;line-height:1.6}h2{margin-top:40px;font-size:26px}.cats{display:flex;flex-wrap:wrap;gap:20px 22px;margin:18px 0}.cats a{font-weight:700}.article p{color:#53685e}a{color:#276a4c}.tag{font-size:13px;color:#276a4c}
-</style></head><body><header><a href="index.html">くらしの手帖｜トップへ戻る</a></header>
+</style></head><body><header><a href="index.html">暮らしのまごの手｜トップへ戻る</a></header>
 <main><h1>片付け・掃除・住まいの困りごとを解決する記事一覧</h1><p>不用品処分、遺品整理、ハウスクリーニング、引越し、住まいのトラブルなど、依頼前に確認したいことをテーマ別にまとめました。公式資料を参照した記事には、出典と資料の確認日を掲載しています。</p><p>作業を依頼する前に条件を整理したい方は、<a href="request-memo.html">無料の作業依頼メモ作成ツール</a>もご活用ください。</p>'''
     entries = catalog(root, items)
     list_page += '<nav class="cats" aria-label="カテゴリー">' + ''.join(
@@ -223,7 +223,7 @@ main{max-width:900px;padding:40px 22px 70px;margin:auto}h1{font-size:34px}
         group = [x for x in entries if x['category'] == name]
         if group:
             list_page += f'<section id="cat-{key}"><h2>{e(name)}</h2>' + cards(group) + '</section>'
-    list_page += '</main><footer>くらしの手帖</footer></body></html>'
+    list_page += '</main><footer>暮らしのまごの手</footer></body></html>'
     (root / 'article-list.html').write_text(set_canonical(list_page, BASE + 'article-list.html'), encoding='utf-8')
     available = [path for path, _ in SUPPORT if (root / path).is_file()]
     dated_items = {x['path']: x['checked_at'] for x in items}

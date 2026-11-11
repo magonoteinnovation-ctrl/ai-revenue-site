@@ -191,7 +191,7 @@ def check(root=ROOT):
             config = {}
         if config.get('display') != 'browser':
             errors.append('manifest.webmanifest: display は browser を維持してください')
-        if config.get('short_name') != 'くらしの手帖':
+        if config.get('short_name') != '暮らしのまごの手':
             errors.append('manifest.webmanifest: short_name が一致しません')
         sizes = set()
         for icon in config.get('icons', []):
@@ -203,7 +203,7 @@ def check(root=ROOT):
         if not {'192x192', '512x512'} <= sizes:
             errors.append('manifest.webmanifest: 192と512ピクセルのアイコンが必要です')
         home = (root / 'index.html').read_text(encoding='utf-8')
-        for element in ('rel="manifest"', 'name="application-name" content="くらしの手帖"', 'href="favicon.png"', 'href="apple-touch-icon.png"'):
+        for element in ('rel="manifest"', 'name="application-name" content="暮らしのまごの手"', 'href="favicon.png"', 'href="apple-touch-icon.png"'):
             if element not in home:
                 errors.append(f'index.html: ホーム画面用指定がありません: {element}')
         if re.search(r'serviceWorker\\.register', home):

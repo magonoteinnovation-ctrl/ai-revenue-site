@@ -151,14 +151,14 @@ def render(article, source, day):
     return f'''<!doctype html><html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="{e(summary(article['sections'][0]['text']), quote=True)}">
-<title>{e(article['title'])}｜くらしの手帖</title>
+<title>{e(article['title'])}｜暮らしのまごの手</title>
 <style>body{{margin:0;background:#faf8f2;color:#1b2d29;font-family:Meiryo,sans-serif;line-height:1.95}}header,footer{{padding:24px;background:#173b32;color:white}}header a,footer a{{color:white}}main{{max-width:780px;margin:auto;padding:40px 22px 70px}}h1{{font-size:clamp(26px,5vw,40px);line-height:1.5}}h2{{margin-top:36px;font-size:23px}}aside{{padding:20px;background:#edf3e9;border-radius:12px;margin:28px 0}}a{{color:#276a4c}}small{{color:#566b60}}</style></head>
-<body><header><a href="../index.html">くらしの手帖｜トップへ戻る</a></header>
+<body><header><a href="../index.html">暮らしのまごの手｜トップへ戻る</a></header>
 <main><p><small>住まい・暮らし ／ 資料確認日：{day}</small></p>
 <h1>{e(article['title'])}</h1>
 <aside>この記事は国民生活センターの公開資料をAIで要約したものです。実際の作業・使用体験を紹介した記事ではありません。詳しい条件は出典とお使いの製品の取扱説明書をご確認ください。</aside>
 {sections}<aside><strong>出典・確認日</strong><p><a href="{e(source['url'], quote=True)}" rel="noopener">国民生活センターの公式資料を読む</a></p><p>確認日：{day}。資料の更新に応じて内容を見直します。AIの要約に誤りがある可能性があるため、判断の際は原文をご確認ください。</p></aside>
-<a href="../index.html#articles">記事一覧へ戻る</a></main><footer>くらしの手帖</footer></body></html>'''
+<a href="../index.html#articles">記事一覧へ戻る</a></main><footer>暮らしのまごの手</footer></body></html>'''
 
 
 def main():
