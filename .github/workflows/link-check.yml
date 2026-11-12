@@ -29,3 +29,8 @@ jobs:
           for page in index.html article-list.html contact.html; do
             grep -Fq 'https://magonote-innovation.wixsite.com/benriya' "$page" || { echo "公式サイトへのリンクがありません: $page"; exit 1; }
           done
+      - name: Check top page shop buttons and manual ad slot (repository file)
+        run: python3 scripts/check_live_site.py --file index.html
+      - name: Check published top pages and sample articles
+        # 広告リンクはクリックせず、公開中のHTMLで計測付きリンク・広告枠の設置を照合する
+        run: python3 scripts/check_live_site.py

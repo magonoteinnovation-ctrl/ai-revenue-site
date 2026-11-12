@@ -64,6 +64,8 @@ jobs:
           for page in index.html article-list.html contact.html; do
             grep -Fq 'https://magonote-innovation.wixsite.com/benriya' "$page" || { echo "公式サイトへのリンクがありません: $page"; exit 1; }
           done
+      - name: トップの買い物ボタンと手動広告枠を検証（公開前）
+        run: python scripts/check_live_site.py --file index.html
       - name: 検証済みの記事を保存
         run: |
           # 新しいページやCSS・画像を追加しても保存漏れがないよう、公開対象をまとめて指定する
@@ -121,3 +123,17 @@ jobs:
       - name: サイトを公開
         uses: actions/deploy-pages@v4
         id: deployment
+  verify:
+    # 公開後に、公開中のトップ（/ と /index.html）で買い物ボタン・手動広告枠・代表記事リンクを検査する
+    # 広告リンクはクリックせずHTMLで照合する。広告の配信実績はAdSense管理画面で確認する
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: 公開の反映を待つ
+        run: sleep 30
+      - name: 公開中のトップと代表記事を検査
+        run: python3 scripts/check_live_site.py
