@@ -1,5 +1,8 @@
 """トップの買い物ボタン（hero-shop）と手動広告枠（top-ad）、代表記事へのリンクを検査する。
 
+手動広告枠は TOP_AD_SLOTS の順に、各スロットが top-ad 内にちょうど1つずつあり、
+トップ全体の手動広告枠が MAX_TOP_ADS 以下であることを確かめる。
+
 使い方:
   python scripts/check_live_site.py                # 公開中のサイト（両方のトップURL）を検査
   python scripts/check_live_site.py --file index.html   # 公開前のファイルを検査
@@ -21,7 +24,15 @@ TOP_URLS = [BASE, BASE + 'index.html']
 AMAZON_TAG = 'tag=magonoteinnov-22'
 RAKUTEN_A8 = 'a8mat=3HC21T+C6SIE2+2HOM+BW8O1'
 AD_CLIENT = 'ca-pub-8158546915072061'
-AD_SLOT = '2417620558'
+# トップの手動広告ユニット（ページ上の並び順）。2417620558は2026-11-12設置、他の3つは2026-11-14設置
+TOP_AD_SLOTS = [
+    ('2417620558', 'お悩み別の直後（top_after_categories_responsive）'),
+    ('6646146776', '無料ツールの案内の直後（top_after_tools_responsive）'),
+    ('4873900109', '記事一覧の直後・商品サービス案内の前（top_after_articles_responsive）'),
+    ('2323758388', '運営方針の直後・フッターの手前（top_after_about_responsive）'),
+]
+AD_SLOT = TOP_AD_SLOTS[0][0]  # 既存の1枠目（互換用）
+MAX_TOP_ADS = 4
 ARTICLE_SAMPLES = 3
 UA = 'Mozilla/5.0 (compatible; ai-revenue-site-check/1.0)'
 
@@ -35,6 +46,7 @@ class TopParser(html.parser.HTMLParser):
         self.hero_links = []
         self.top_ad_ins = []
         self.all_slots = []
+        self.outside_ins = 0
         self.article_links = []
 
     def _region(self):
@@ -61,6 +73,8 @@ class TopParser(html.parser.HTMLParser):
                 self.all_slots.append(a.get('data-ad-slot'))
             if current == 'top-ad':
                 self.top_ad_ins.append(a)
+            else:
+                self.outside_ins += 1
         if tag not in ('img', 'br', 'hr', 'meta', 'link', 'input', 'source', 'wbr'):
             self.stack.append((tag, region))
 
@@ -89,14 +103,24 @@ def check_top_html(text, label):
             errors.append(f'{label}: hero-shop の広告リンクに rel="nofollow sponsored noopener" がありません')
     if 'PR' not in text[text.find('hero-shop'):text.find('hero-shop') + 4000]:
         errors.append(f'{label}: hero-shop にPR表記がありません')
-    if len(p.top_ad_ins) != 1:
-        errors.append(f'{label}: top-ad の手動広告枠が {len(p.top_ad_ins)} 個です（1個であること）')
-    else:
-        ins = p.top_ad_ins[0]
-        if ins.get('data-ad-slot') != AD_SLOT or ins.get('data-ad-client') != AD_CLIENT:
-            errors.append(f'{label}: top-ad の広告ユニットIDが想定（slot {AD_SLOT}）と違います')
-    if p.all_slots.count(AD_SLOT) != 1:
-        errors.append(f'{label}: トップ専用ユニット（slot {AD_SLOT}）がページ内に {p.all_slots.count(AD_SLOT)} 個あります（1個であること）')
+    expected = [s for s, _ in TOP_AD_SLOTS]
+    total = len(p.top_ad_ins) + p.outside_ins
+    if total > MAX_TOP_ADS:
+        errors.append(f'{label}: 手動広告枠がトップ全体で {total} 個あります（最大{MAX_TOP_ADS}個）')
+    if p.outside_ins:
+        errors.append(f'{label}: top-ad の外に手動広告枠が {p.outside_ins} 個あります（独立した top-ad セクションに置くこと）')
+    if len(p.top_ad_ins) != len(expected):
+        errors.append(f'{label}: top-ad の手動広告枠が {len(p.top_ad_ins)} 個です（{len(expected)}個であること）')
+    for ins in p.top_ad_ins:
+        if ins.get('data-ad-client') != AD_CLIENT:
+            errors.append(f'{label}: top-ad の広告のサイト運営者ID（{AD_CLIENT}）が違います')
+    for slot, where in TOP_AD_SLOTS:
+        n = p.all_slots.count(slot)
+        if n != 1:
+            errors.append(f'{label}: {where}（slot {slot}）がページ内に {n} 個あります（1個であること）')
+    found = [i.get('data-ad-slot') for i in p.top_ad_ins]
+    if sorted(found) == sorted(expected) and found != expected:
+        errors.append(f'{label}: 手動広告枠の並び順が想定と違います（{" → ".join(found)}）')
     if text.count('adsbygoogle.js') != 1:
         errors.append(f'{label}: AdSense読み込みスクリプトが {text.count("adsbygoogle.js")} 本です（1本であること）')
     if not p.article_links:
@@ -155,7 +179,8 @@ def main(argv=None):
         for e in errors:
             print('::error::' + e)
         return 1
-    print('トップの買い物ボタン（Amazon・楽天）・手動広告枠1つ・代表記事リンクの検査に成功しました。'
+    print(f'トップの買い物ボタン（Amazon・楽天）・手動広告枠{len(TOP_AD_SLOTS)}つ（slot '
+          + ' / '.join(s for s, _ in TOP_AD_SLOTS) + '）・代表記事リンクの検査に成功しました。'
           '（広告枠の設置のみ確認。配信実績はAdSense管理画面で確認）')
     return 0
 
